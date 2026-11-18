@@ -10,6 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --baac-green: #1a7a3c;
@@ -556,14 +557,40 @@
   <div class="card">
     <div class="card-header">ข้อมูลเกษตรกร / เจ้าหน้าที่</div>
     <div class="card-body">
+
+      <!-- ===== CIF Load / Save ===== -->
+      <div style="background:#e3f2fd; border:2px solid #1565c0; border-radius:10px; padding:1rem; margin-bottom:1.2rem;">
+        <div style="font-weight:700; color:#0d47a1; margin-bottom:.6rem; font-size:1rem;">
+          🔑 โหลด / บันทึกข้อมูลด้วย CIF
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:.6rem; align-items:center;">
+          <input type="text" id="cifInput" placeholder="กรอก CIF หรือเลขที่สัญญา" 
+                 style="flex:1; min-width:180px; padding:.6rem .8rem; border:2px solid #90caf9; border-radius:8px; font-size:1rem; font-weight:600;">
+          <button type="button" onclick="loadByCIF()" 
+                  style="background:#1565c0; color:white; border:none; padding:.65rem 1.2rem; border-radius:8px; font-weight:700; cursor:pointer; min-height:44px;">
+            โหลดข้อมูล
+          </button>
+          <button type="button" onclick="saveByCIF()" 
+                  style="background:#2e7d32; color:white; border:none; padding:.65rem 1.2rem; border-radius:8px; font-weight:700; cursor:pointer; min-height:44px;">
+            บันทึกข้อมูล
+          </button>
+        </div>
+        <div id="cifStatus" style="margin-top:.55rem; font-size:.88rem; color:#333; min-height:1.3em;"></div>
+        <p style="margin:.5rem 0 0; font-size:.8rem; color:#555;">
+          • ครั้งแรก: กรอก CIF แล้วกรอกข้อมูล → กด <strong>บันทึกข้อมูล</strong><br>
+          • ครั้งต่อไป: กรอก CIF แล้วกด <strong>โหลดข้อมูล</strong> ระบบจะดึงข้อมูลชุดล่าสุดมาให้
+        </p>
+      </div>
+      <!-- ===== End CIF ===== -->
+
       <div class="farmer-info">
         <div>
           <label>ชื่อ-นามสกุล เกษตรกร</label>
           <input type="text" id="farmerName" placeholder="ชื่อเกษตรกร">
         </div>
         <div>
-          <label>เลขที่สัญญา / รหัสลูกค้า</label>
-          <input type="text" id="loanId" placeholder="เช่น BAAC-XXXX">
+          <label>เลขที่สัญญา / รหัสลูกค้า (CIF)</label>
+          <input type="text" id="loanId" placeholder="เช่น BAAC-XXXX หรือ CIF">
         </div>
         <div>
           <label>จังหวัด / อำเภอ</label>
@@ -586,27 +613,68 @@
           <input type="text" id="officerName" placeholder="ชื่อเจ้าหน้าที่">
         </div>
         <div>
-          <label>ประเภทพืช / กิจกรรมเกษตร</label>
+          <label>ประเภทพืช / กิจกรรมเกษตร (Industry)</label>
           <select id="agriType" onchange="syncSectorFromAgri()">
-            <option value="rice_central">ข้าวนาปี/นาปรัง – ภาคกลาง (ค่าเริ่มต้น)</option>
-            <option value="rice_high">ข้าว – พื้นที่เสี่ยงสูง</option>
-            <option value="rice_med">ข้าว – พื้นที่เสี่ยงปานกลาง</option>
-            <option value="rice_low">ข้าว – พื้นที่เสี่ยงต่ำ</option>
-            <option value="other_crop">พืชไร่ / พืชสวน อื่นๆ</option>
-            <option value="livestock">ปศุสัตว์ / ประมง</option>
+            <optgroup label="—— ข้าว ——">
+              <option value="rice_central">ข้าวนาปี/นาปรัง – ภาคกลาง (ค่าเริ่มต้น)</option>
+              <option value="rice_high">ข้าว – พื้นที่เสี่ยงสูง (น้ำท่วม/แล้งบ่อย)</option>
+              <option value="rice_med">ข้าว – พื้นที่เสี่ยงปานกลาง</option>
+              <option value="rice_low">ข้าว – พื้นที่เสี่ยงต่ำ / ชลประทานดี</option>
+              <option value="rice_northeast">ข้าว – ภาคอีสาน</option>
+              <option value="rice_north">ข้าว – ภาคเหนือ</option>
+              <option value="rice_south">ข้าว – ภาคใต้</option>
+            </optgroup>
+            <optgroup label="—— พืชไร่ / พืชสวน ——">
+              <option value="cassava">มันสำปะหลัง</option>
+              <option value="sugarcane">อ้อย</option>
+              <option value="maize">ข้าวโพด</option>
+              <option value="rubber">ยางพารา</option>
+              <option value="palm">ปาล์มน้ำมัน</option>
+              <option value="fruit">ผลไม้ / พืชสวน</option>
+              <option value="other_crop">พืชไร่ / พืชสวน อื่นๆ</option>
+            </optgroup>
+            <optgroup label="—— ปศุสัตว์ / ประมง / อื่นๆ ——">
+              <option value="livestock">ปศุสัตว์ (ไก่ หมู วัว)</option>
+              <option value="fishery">ประมง / กุ้ง</option>
+              <option value="mixed">เกษตรผสมผสาน</option>
+              <option value="other">อื่นๆ</option>
+            </optgroup>
           </select>
         </div>
         <div>
-          <label>คะแนนภาคเศรษฐกิจ (Sector ESG Score 0–6)</label>
-          <select id="sectorScore">
-            <option value="4.5">4.5 – ข้าวภาคกลาง (ค่าเริ่มต้น)</option>
-            <option value="5.0">5.0 – ข้าวพื้นที่เสี่ยงสูง</option>
-            <option value="4.0">4.0 – ข้าวพื้นที่เสี่ยงปานกลาง</option>
-            <option value="3.5">3.5 – ข้าวพื้นที่เสี่ยงต่ำ</option>
-            <option value="4.8">4.8 – พืชไร่ทั่วไป</option>
-            <option value="3.8">3.8 – ปศุสัตว์ / ประมง</option>
-            <option value="3.0">3.0 – อื่นๆ</option>
+          <label>คะแนนความเสี่ยงภาคเศรษฐกิจ (Sector ESG Score 0–6)</label>
+          <select id="sectorScore" onchange="if(typeof calculate==='function') calculate()">
+            <optgroup label="—— ข้าว (แนะนำ) ——">
+              <option value="5.0">5.0 – ข้าวพื้นที่เสี่ยงสูง</option>
+              <option value="4.5" selected>4.5 – ข้าวภาคกลาง (ค่าเริ่มต้น)</option>
+              <option value="4.2">4.2 – ข้าวภาคอีสาน / เหนือ</option>
+              <option value="4.0">4.0 – ข้าวพื้นที่เสี่ยงปานกลาง</option>
+              <option value="3.5">3.5 – ข้าวพื้นที่เสี่ยงต่ำ</option>
+            </optgroup>
+            <optgroup label="—— พืชไร่ / พืชสวน ——">
+              <option value="5.2">5.2 – มันสำปะหลัง / อ้อย (เสี่ยงสูง)</option>
+              <option value="4.8">4.8 – พืชไร่ทั่วไป</option>
+              <option value="4.3">4.3 – ยางพารา / ปาล์ม</option>
+              <option value="3.9">3.9 – ผลไม้ / พืชสวน</option>
+            </optgroup>
+            <optgroup label="—— ปศุสัตว์ / ประมง / อื่นๆ ——">
+              <option value="3.8">3.8 – ปศุสัตว์</option>
+              <option value="4.1">4.1 – ประมง / กุ้ง</option>
+              <option value="3.5">3.5 – เกษตรผสมผสาน</option>
+              <option value="3.0">3.0 – อื่นๆ / ความเสี่ยงต่ำ</option>
+            </optgroup>
+            <optgroup label="—— เลือกเอง (0–6) ——">
+              <option value="6.0">6.0 – ความเสี่ยงสูงสุด</option>
+              <option value="5.5">5.5</option>
+              <option value="2.5">2.5</option>
+              <option value="2.0">2.0</option>
+              <option value="1.5">1.5</option>
+              <option value="1.0">1.0 – ความเสี่ยงต่ำมาก</option>
+            </optgroup>
           </select>
+          <p style="font-size:.78rem; color:#555; margin-top:.25rem;">
+            ระบบจะตั้งค่าให้อัตโนมัติตามประเภทพืช แต่คุณสามารถ<strong>เปลี่ยนเอง</strong>ได้
+          </p>
         </div>
         <div style="grid-column: 1 / -1; margin-top: .4rem;">
           <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:.75rem 1rem; font-size:.88rem;">
@@ -694,14 +762,30 @@
         <div class="matrix-title">เมทริกซ์การตัดสินใจด้าน ESG (ESG Risk Decision Matrix)</div>
         <div class="matrix-wrap">
           <div style="display:flex; align-items:stretch;">
-            <div class="matrix-y-label">คะแนนความเสี่ยงคงเหลือ (Residual Risk) →</div>
+            <div class="matrix-y-label">Residual Risk (0–6) →</div>
             <div class="matrix-grid-outer">
               <div class="matrix-grid" id="matrixGrid"></div>
-              <div class="matrix-x-label">คะแนนภาคเศรษฐกิจ (Sector ESG Score) →</div>
+              <div class="matrix-x-label">Sector ESG Score (0–6) →</div>
             </div>
           </div>
           <div class="zone-info" id="zoneInfo">
             <div class="zone-badge low" id="zoneBadge">ยังไม่ประเมิน</div>
+
+            <!-- Exact position on 6×6 matrix -->
+            <div id="matrixPositionBox" style="background:#f5f5f5; border:1px solid #ddd; border-radius:8px; padding:.7rem 1rem; margin-bottom:.7rem; font-size:.88rem;">
+              <div style="font-weight:700; color:#333; margin-bottom:.35rem;">ตำแหน่งบนเมทริกซ์ (0–6)</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:.4rem 1rem;">
+                <div>Sector Score (แกน X): <strong id="posSector">–</strong></div>
+                <div>Residual Score (แกน Y): <strong id="posResidual">–</strong></div>
+              </div>
+              <div style="margin-top:.4rem; color:#555;">
+                พิกัดโดยประมาณ: (<span id="posCoordX">–</span> , <span id="posCoordY">–</span>) บนตาราง 6×6
+              </div>
+              <div style="margin-top:.35rem; font-size:.8rem; color:#666;">
+                จุดสีน้ำเงินบนตาราง = ตำแหน่งของเกษตรกรรายนี้
+              </div>
+            </div>
+
             <div class="risk-detail" id="riskDetail">
               <h4>รายละเอียดความเสี่ยง</h4>
               <p>กรุณาให้คะแนนตัวชี้วัดทั้ง 14 ข้อ แล้วกดคำนวณ</p>
@@ -1223,6 +1307,178 @@
 <script>
 const scores = {};
 const doubleWeight = new Set([8, 10, 11, 13]);
+
+// ========== SUPABASE CIF STORAGE ==========
+const SUPABASE_URL = 'https://mznblculkciycwlgpedy.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_m4MA3ZdyX_ltluRDRpOC-g_VYAiHumu';
+let supabaseClient = null;
+
+function initSupabase() {
+  try {
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      return true;
+    }
+  } catch (e) {
+    console.warn('Supabase init error:', e);
+  }
+  return false;
+}
+
+function setCifStatus(msg, isError = false) {
+  const el = document.getElementById('cifStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = isError ? '#c62828' : '#1b5e20';
+}
+
+function getCurrentFormData() {
+  // Ensure scores are calculated
+  if (typeof calculate === 'function') calculate();
+
+  const scoreObj = {};
+  for (let i = 1; i <= 14; i++) {
+    scoreObj[i] = scores[i] !== undefined ? scores[i] : null;
+  }
+
+  return {
+    cif: (document.getElementById('cifInput').value || document.getElementById('loanId').value || '').trim(),
+    farmer_name: document.getElementById('farmerName').value.trim() || null,
+    location: document.getElementById('location').value.trim() || null,
+    area_rai: parseFloat(document.getElementById('area').value) || null,
+    assess_date: document.getElementById('assessDate').value || null,
+    officer_name: document.getElementById('officerName').value.trim() || null,
+    agri_type: document.getElementById('agriType').value || null,
+    sector_score: parseFloat(document.getElementById('sectorScore').value) || null,
+    notes: document.getElementById('notes').value.trim() || null,
+    scores: scoreObj,
+    overall_score: parseFloat(document.getElementById('overallScore').textContent) || null,
+    residual_score: parseFloat(document.getElementById('residualScore').textContent) || null,
+    zone: document.getElementById('zoneBadge').textContent || null,
+    updated_at: new Date().toISOString()
+  };
+}
+
+async function saveByCIF() {
+  if (!supabaseClient) initSupabase();
+  if (!supabaseClient) {
+    setCifStatus('❌ ระบบบันทึกยังไม่พร้อม (Supabase ไม่โหลด) — ลองรีเฟรชหน้า', true);
+    return;
+  }
+
+  const cif = (document.getElementById('cifInput').value || document.getElementById('loanId').value || '').trim();
+  if (!cif) {
+    setCifStatus('กรุณากรอก CIF หรือเลขที่สัญญาก่อนบันทึก', true);
+    return;
+  }
+
+  // Sync loanId field
+  document.getElementById('loanId').value = cif;
+  document.getElementById('cifInput').value = cif;
+
+  const data = getCurrentFormData();
+  data.cif = cif;
+
+  setCifStatus('กำลังบันทึก...');
+
+  try {
+    const { error } = await supabaseClient
+      .from('esg_assessments')
+      .upsert(data, { onConflict: 'cif' });
+
+    if (error) throw error;
+    setCifStatus('✅ บันทึกสำเร็จ สำหรับ CIF: ' + cif + ' (' + new Date().toLocaleString('th-TH') + ')');
+  } catch (err) {
+    console.error(err);
+    setCifStatus('❌ บันทึกไม่สำเร็จ: ' + (err.message || err), true);
+  }
+}
+
+async function loadByCIF() {
+  if (!supabaseClient) initSupabase();
+  if (!supabaseClient) {
+    setCifStatus('❌ ระบบโหลดยังไม่พร้อม (Supabase ไม่โหลด) — ลองรีเฟรชหน้า', true);
+    return;
+  }
+
+  const cif = (document.getElementById('cifInput').value || document.getElementById('loanId').value || '').trim();
+  if (!cif) {
+    setCifStatus('กรุณากรอก CIF ที่ต้องการโหลด', true);
+    return;
+  }
+
+  setCifStatus('กำลังโหลดข้อมูล...');
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('esg_assessments')
+      .select('*')
+      .eq('cif', cif)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        setCifStatus('ไม่พบข้อมูลสำหรับ CIF นี้ — สามารถกรอกใหม่แล้วกดบันทึกได้', true);
+      } else {
+        throw error;
+      }
+      return;
+    }
+
+    // Fill form fields
+    document.getElementById('cifInput').value = data.cif || '';
+    document.getElementById('loanId').value = data.cif || '';
+    document.getElementById('farmerName').value = data.farmer_name || '';
+    document.getElementById('location').value = data.location || '';
+    document.getElementById('area').value = data.area_rai != null ? data.area_rai : '';
+    if (typeof updateHectare === 'function') updateHectare();
+    document.getElementById('assessDate').value = data.assess_date || '';
+    document.getElementById('officerName').value = data.officer_name || '';
+    if (data.agri_type) document.getElementById('agriType').value = data.agri_type;
+    if (data.sector_score != null) document.getElementById('sectorScore').value = data.sector_score;
+    document.getElementById('notes').value = data.notes || '';
+
+    // Restore scores
+    for (let i = 1; i <= 14; i++) {
+      delete scores[i];
+      const badge = document.getElementById('badge' + i);
+      if (badge) {
+        badge.textContent = '–';
+        badge.classList.remove('has-score');
+      }
+      document.querySelectorAll('#ind' + i + ' .score-opt').forEach(o => o.classList.remove('selected'));
+    }
+
+    if (data.scores) {
+      for (let i = 1; i <= 14; i++) {
+        const val = data.scores[i] ?? data.scores[String(i)];
+        if (val !== null && val !== undefined) {
+          scores[i] = parseFloat(val);
+          const badge = document.getElementById('badge' + i);
+          if (badge) {
+            badge.textContent = scores[i];
+            badge.classList.add('has-score');
+          }
+          // highlight selected option
+          document.querySelectorAll('#ind' + i + ' .score-opt').forEach(opt => {
+            if (parseFloat(opt.getAttribute('data-val')) === scores[i]) {
+              opt.classList.add('selected');
+            }
+          });
+        }
+      }
+    }
+
+    if (typeof calculate === 'function') calculate();
+
+    const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('th-TH') : '';
+    setCifStatus('✅ โหลดข้อมูลสำเร็จ (บันทึกล่าสุด: ' + updated + ')');
+  } catch (err) {
+    console.error(err);
+    setCifStatus('❌ โหลดไม่สำเร็จ: ' + (err.message || err), true);
+  }
+}
+// ========== END SUPABASE ==========
 const labels = [
   '1.ที่ตั้ง', '2.น้ำ', '3.พลังงาน', '4.ห่วงโซ่', '5.ข้อมูล', '6.ประกัน',
   '7.GHG', '8.พลังงานหมุน', '9.ทรัพยากร', '10.ผลิตภัณฑ์',
@@ -1356,16 +1612,33 @@ function updateHectare() {
 
 function syncSectorFromAgri() {
   const map = {
+    // Rice
     rice_central: '4.5',
     rice_high: '5.0',
     rice_med: '4.0',
     rice_low: '3.5',
+    rice_northeast: '4.2',
+    rice_north: '4.2',
+    rice_south: '4.0',
+    // Field crops / orchard
+    cassava: '5.2',
+    sugarcane: '5.2',
+    maize: '4.8',
+    rubber: '4.3',
+    palm: '4.3',
+    fruit: '3.9',
     other_crop: '4.8',
-    livestock: '3.8'
+    // Livestock / fishery / other
+    livestock: '3.8',
+    fishery: '4.1',
+    mixed: '3.5',
+    other: '3.0'
   };
   const v = document.getElementById('agriType').value;
-  if (map[v]) document.getElementById('sectorScore').value = map[v];
-  calculate();
+  if (map[v]) {
+    document.getElementById('sectorScore').value = map[v];
+  }
+  if (typeof calculate === 'function') calculate();
 }
 
 function getSectorScore() {
@@ -1383,8 +1656,19 @@ function getZone(sector, residual) {
 function buildMatrix(sectorScore, residualScore) {
   const grid = document.getElementById('matrixGrid');
   grid.innerHTML = '';
-  const secCol = Math.min(5, Math.max(0, Math.floor(sectorScore)));
+  // Map continuous 0–6 scores onto the 6 discrete cells (0..5)
+  const secCol = Math.min(5, Math.max(0, Math.round(sectorScore) > 5 ? 5 : Math.floor(sectorScore)));
   const resRow = Math.min(5, Math.max(0, 5 - Math.floor(residualScore)));
+
+  // Update exact position text
+  const posSector = document.getElementById('posSector');
+  const posResidual = document.getElementById('posResidual');
+  const posCoordX = document.getElementById('posCoordX');
+  const posCoordY = document.getElementById('posCoordY');
+  if (posSector) posSector.textContent = (sectorScore != null && !isNaN(sectorScore)) ? Number(sectorScore).toFixed(2) : '–';
+  if (posResidual) posResidual.textContent = (residualScore != null && !isNaN(residualScore)) ? Number(residualScore).toFixed(2) : '–';
+  if (posCoordX) posCoordX.textContent = (sectorScore != null && !isNaN(sectorScore)) ? Math.min(5, Math.max(0, Math.floor(sectorScore))) : '–';
+  if (posCoordY) posCoordY.textContent = (residualScore != null && !isNaN(residualScore)) ? Math.min(5, Math.max(0, Math.floor(residualScore))) : '–';
 
   for (let row = 0; row < 7; row++) {
     for (let col = 0; col < 7; col++) {
@@ -1769,6 +2053,14 @@ function resetForm() {
   document.getElementById('riskDetail').innerHTML = '<h4>รายละเอียดความเสี่ยง</h4><p>กรุณาให้คะแนนตัวชี้วัดทั้ง 14 ข้อ แล้วกดคำนวณ</p>';
   document.getElementById('mitigationBox').innerHTML = '<h4>มาตรการลดความเสี่ยง / การสนับสนุนลูกค้า (ภาคเกษตร)</h4><p>ผลจะแสดงหลังการคำนวณ</p>';
   document.getElementById('actionBox').style.display = 'none';
+  const ps = document.getElementById('posSector');
+  const pr = document.getElementById('posResidual');
+  const px = document.getElementById('posCoordX');
+  const py = document.getElementById('posCoordY');
+  if (ps) ps.textContent = '–';
+  if (pr) pr.textContent = '–';
+  if (px) px.textContent = '–';
+  if (py) py.textContent = '–';
   buildMatrix(0, 0);
   if (radarChart) {
     radarChart.data.datasets[0].data = Array(14).fill(0);
@@ -1780,6 +2072,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('assessDate').valueAsDate = new Date();
   updateRadar(Array(14).fill(0));
   buildMatrix(0, 0);
+  initSupabase(); // load cloud storage after page is ready
 
   // Reliable bindings (works better than inline handlers in some mobile webviews)
   const areaInput = document.getElementById('area');
