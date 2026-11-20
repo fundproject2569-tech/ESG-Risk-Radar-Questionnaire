@@ -30,9 +30,32 @@
     color: white;
     padding: 1.2rem 1.5rem;
     box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    position: relative;
   }
   header h1 { font-size: 1.35rem; font-weight: 700; }
   header p { font-size: .9rem; opacity: .9; margin-top: .3rem; }
+  .lang-switch {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    display: flex;
+    gap: .4rem;
+  }
+  .lang-switch button {
+    background: rgba(255,255,255,.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,.4);
+    border-radius: 6px;
+    padding: .3rem .65rem;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 32px;
+  }
+  .lang-switch button.active {
+    background: white;
+    color: var(--baac-dark);
+  }
   .container { max-width: 1100px; margin: 0 auto; padding: 1rem; }
   .card {
     background: white;
@@ -539,8 +562,13 @@
 </head>
 <body>
 <header>
-  <h1>ธ.ก.ส. · แบบประเมิน ESG Due Diligence (ฉบับย่อ V3)</h1>
-  <p>กลุ่มเป้าหมาย: เกษตรกรผู้ปลูกข้าว | รายย่อย (S1) · คะแนน 0 / 0.25 / 0.5 / 0.75 / 1.0 · ภาคเกษตร</p>
+  <div class="lang-switch">
+    <button type="button" onclick="setLang('th')" id="btn-th" class="active">ไทย</button>
+    <button type="button" onclick="setLang('en')" id="btn-en">EN</button>
+    <button type="button" onclick="setLang('de')" id="btn-de">DE</button>
+  </div>
+  <h1 id="mainTitle">ธ.ก.ส. · แบบประเมิน ESG Due Diligence (ฉบับย่อ V3)</h1>
+  <p id="mainSubtitle">กลุ่มเป้าหมาย: เกษตรกรผู้ปลูกข้าว | รายย่อย (S1) · คะแนน 0 / 0.25 / 0.5 / 0.75 / 1.0 · ภาคเกษตร</p>
 </header>
 
 <div id="openTip" style="background:#fff3e0;border-bottom:2px solid #ffb74d;padding:.75rem 1rem;font-size:.88rem;color:#e65100;">
@@ -2086,11 +2114,108 @@ function resetForm() {
   }
 }
 
+function resetForm() {
+  // ... existing reset code ...
+}
+
+// ========== LANGUAGE SWITCH ==========
+const translations = {
+  th: {
+    mainTitle: 'ธ.ก.ส. · แบบประเมิน ESG Due Diligence (ฉบับย่อ V3)',
+    mainSubtitle: 'กลุ่มเป้าหมาย: เกษตรกรผู้ปลูกข้าว | รายย่อย (S1) · คะแนน 0 / 0.25 / 0.5 / 0.75 / 1.0 · ภาคเกษตร',
+    cifTitle: '🔑 โหลด / บันทึกข้อมูลด้วย CIF',
+    loadBtn: 'โหลดข้อมูล',
+    saveBtn: 'บันทึกข้อมูล',
+    farmerSection: 'ข้อมูลเกษตรกร / เจ้าหน้าที่',
+    farmerName: 'ชื่อ-นามสกุล เกษตรกร',
+    loanId: 'เลขที่สัญญา / รหัสลูกค้า (CIF)',
+    location: 'จังหวัด / อำเภอ',
+    area: 'พื้นที่เพาะปลูก (ไร่)',
+    assessDate: 'วันที่ประเมิน',
+    officerName: 'ชื่อเจ้าหน้าที่สินเชื่อ',
+    agriType: 'ประเภทพืช / กิจกรรมเกษตร (Industry)',
+    sectorScore: 'คะแนนความเสี่ยงภาคเศรษฐกิจ (Sector ESG Score 0–6)'
+  },
+  en: {
+    mainTitle: 'BAAC · ESG Due Diligence Assessment (Short Version V3)',
+    mainSubtitle: 'Target: Smallholder rice farmers (S1) · Score 0 / 0.25 / 0.5 / 0.75 / 1.0 · Agriculture',
+    cifTitle: '🔑 Load / Save data with CIF',
+    loadBtn: 'Load Data',
+    saveBtn: 'Save Data',
+    farmerSection: 'Farmer / Officer Information',
+    farmerName: 'Farmer Name',
+    loanId: 'Loan No. / Customer ID (CIF)',
+    location: 'Province / District',
+    area: 'Farm Area (rai)',
+    assessDate: 'Assessment Date',
+    officerName: 'Credit Officer Name',
+    agriType: 'Crop Type / Agricultural Activity',
+    sectorScore: 'Sector ESG Score (0–6)'
+  },
+  de: {
+    mainTitle: 'BAAC · ESG Due Diligence Bewertung (Kurzversion V3)',
+    mainSubtitle: 'Zielgruppe: Kleinbauern Reis (S1) · Punkte 0 / 0.25 / 0.5 / 0.75 / 1.0 · Landwirtschaft',
+    cifTitle: '🔑 Daten mit CIF laden / speichern',
+    loadBtn: 'Daten laden',
+    saveBtn: 'Daten speichern',
+    farmerSection: 'Landwirt / Mitarbeiter Informationen',
+    farmerName: 'Name des Landwirts',
+    loanId: 'Vertragsnr. / Kunden-ID (CIF)',
+    location: 'Provinz / Bezirk',
+    area: 'Anbaufläche (Rai)',
+    assessDate: 'Bewertungsdatum',
+    officerName: 'Name des Kreditmitarbeiters',
+    agriType: 'Pflanzenart / landwirtschaftliche Tätigkeit',
+    sectorScore: 'Sektor ESG Score (0–6)'
+  }
+};
+
+let currentLang = 'th';
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = translations[lang] || translations.th;
+
+  document.getElementById('mainTitle').textContent = t.mainTitle;
+  document.getElementById('mainSubtitle').textContent = t.mainSubtitle;
+
+  // CIF section
+  const cifTitle = document.querySelector('.card-body div[style*="background:#e3f2fd"] div');
+  if (cifTitle) cifTitle.innerHTML = t.cifTitle;
+
+  const buttons = document.querySelectorAll('.card-body button');
+  if (buttons[0]) buttons[0].textContent = t.loadBtn;
+  if (buttons[1]) buttons[1].textContent = t.saveBtn;
+
+  // Farmer info labels
+  document.querySelector('.card-header').textContent = t.farmerSection;
+  const labels = document.querySelectorAll('.farmer-info label');
+  if (labels[0]) labels[0].textContent = t.farmerName;
+  if (labels[1]) labels[1].textContent = t.loanId;
+  if (labels[2]) labels[2].textContent = t.location;
+  if (labels[3]) labels[3].textContent = t.area;
+  if (labels[4]) labels[4].textContent = t.assessDate;
+  if (labels[5]) labels[5].textContent = t.officerName;
+  if (labels[6]) labels[6].textContent = t.agriType;
+  if (labels[7]) labels[7].textContent = t.sectorScore;
+
+  // Update active button
+  document.querySelectorAll('.lang-switch button').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('btn-' + lang).classList.add('active');
+
+  document.documentElement.lang = lang === 'th' ? 'th' : lang;
+}
+
+// Call once on load
+// setLang('th'); // moved inside DOMContentLoaded
+// ========== END LANGUAGE ==========
+
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('assessDate').valueAsDate = new Date();
   updateRadar(Array(14).fill(0));
   buildMatrix(0, 0);
-  initSupabase(); // load cloud storage after page is ready
+  initSupabase();
+  setLang('th'); // apply default language after DOM is ready
 
   // Reliable bindings (works better than inline handlers in some mobile webviews)
   const areaInput = document.getElementById('area');
