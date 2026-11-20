@@ -36,25 +36,29 @@
   header p { font-size: .9rem; opacity: .9; margin-top: .3rem; }
   .lang-switch {
     position: absolute;
-    top: 1rem;
-    right: 1.2rem;
+    top: 0.6rem;
+    right: 0.8rem;
     display: flex;
-    gap: .4rem;
+    gap: .35rem;
+    z-index: 100;
   }
   .lang-switch button {
-    background: rgba(255,255,255,.15);
+    background: rgba(255,255,255,.25);
     color: white;
-    border: 1px solid rgba(255,255,255,.4);
+    border: 1px solid rgba(255,255,255,.6);
     border-radius: 6px;
-    padding: .3rem .65rem;
-    font-size: .8rem;
-    font-weight: 600;
+    padding: .35rem .7rem;
+    font-size: .85rem;
+    font-weight: 700;
     cursor: pointer;
-    min-height: 32px;
+    min-height: 34px;
+    min-width: 48px;
+    pointer-events: auto;
   }
   .lang-switch button.active {
     background: white;
     color: var(--baac-dark);
+    border-color: white;
   }
   .container { max-width: 1100px; margin: 0 auto; padding: 1rem; }
   .card {
@@ -705,7 +709,7 @@
           </p>
         </div>
         <div style="grid-column: 1 / -1; margin-top: .4rem;">
-          <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:.75rem 1rem; font-size:.88rem;">
+          <div id="riskExplainBox" style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:8px; padding:.75rem 1rem; font-size:.88rem;">
             <strong style="color:#1b5e20;">คำอธิบายง่ายๆ ระดับความเสี่ยงของพื้นที่ (เลือกตามที่ตรงกับนาของเกษตรกรมากที่สุด)</strong>
             <ul style="margin:.45rem 0 0 1.1rem; padding:0; line-height:1.55;">
               <li><strong>พื้นที่เสี่ยงสูง</strong> — น้ำท่วมบ่อย หรือแล้งบ่อย หรือร้อนจัดจนผลผลิตเสียหายบ่อย (เช่น ทุ่งต่ำน้ำท่วมซ้ำ / นอกเขตชลประทานที่ขาดน้ำบ่อย) → เลือกข้อนี้</li>
@@ -717,7 +721,7 @@
           </div>
         </div>
         <div style="grid-column: 1 / -1; margin-top: .5rem;">
-          <div style="background:#fff8e1; border:1px solid #ffe082; border-radius:8px; padding:.7rem 1rem; font-size:.84rem;">
+          <div id="abbrBox" style="background:#fff8e1; border:1px solid #ffe082; border-radius:8px; padding:.7rem 1rem; font-size:.84rem;">
             <strong style="color:#f57f17;">คำย่อที่พบบ่อย (อ่านง่าย)</strong>
             <ul style="margin:.4rem 0 0 1.1rem; padding:0; line-height:1.55;">
               <li><strong>TRIS</strong> = ประกันภัยข้าวของเกษตรกร (ช่วยชดเชยเมื่อผลผลิตเสียหายจากภัยธรรมชาติ)</li>
@@ -731,6 +735,10 @@
             </ul>
           </div>
         </div>
+              <li><strong>CAP</strong> = แผนปฏิบัติการแก้ไข (แผนที่เกษตรกรกับธนาคารตกลงว่าจะปรับปรุงอะไร เมื่อไหร่)</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -740,7 +748,7 @@
     <div class="results-toggle" onclick="toggleResults()">
       <div class="toggle-left">
         <span class="toggle-icon" id="toggleIcon">▼</span>
-        <span>ผลการประเมิน ESG</span>
+        <span id="resultsTitleSpan">ผลการประเมิน ESG</span>
         <div class="mini-scores" id="miniScores">
           <span class="mini-score">รวม: <strong id="miniOverall">–</strong></span>
           <span class="mini-score">Residual: <strong id="miniResidual">–</strong></span>
@@ -801,16 +809,16 @@
 
             <!-- Exact position on 6×6 matrix -->
             <div id="matrixPositionBox" style="background:#f5f5f5; border:1px solid #ddd; border-radius:8px; padding:.7rem 1rem; margin-bottom:.7rem; font-size:.88rem;">
-              <div style="font-weight:700; color:#333; margin-bottom:.35rem;">ตำแหน่งบนเมทริกซ์ (0–6)</div>
+              <div id="matrixPosTitle" style="font-weight:700; color:#333; margin-bottom:.35rem;">ตำแหน่งบนเมทริกซ์ (0–6)</div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:.4rem 1rem;">
                 <div>Sector Score (แกน X): <strong id="posSector">–</strong></div>
                 <div>Residual Score (แกน Y): <strong id="posResidual">–</strong></div>
               </div>
               <div style="margin-top:.4rem; color:#555;">
-                พิกัดโดยประมาณ: (<span id="posCoordX">–</span> , <span id="posCoordY">–</span>) บนตาราง 6×6
+                <span id="coordLabel">พิกัดโดยประมาณ:</span> (<span id="posCoordX">–</span> , <span id="posCoordY">–</span>) บนตาราง 6×6
               </div>
               <div style="margin-top:.35rem; font-size:.8rem; color:#666;">
-                จุดสีน้ำเงินบนตาราง = ตำแหน่งของเกษตรกรรายนี้
+                <span id="blueDotLabel">จุดสีน้ำเงินบนตาราง = ตำแหน่งของเกษตรกรรายนี้</span>
               </div>
             </div>
 
@@ -835,7 +843,7 @@
   <div class="indicator" id="ind1">
     <div class="indicator-header">
       <span class="indicator-num">1</span>
-      <span class="indicator-title">ที่ตั้งทางภูมิศาสตร์และการป้องกันพื้นที่</span>
+      <span class="indicator-title" data-i18n="ind1title">ที่ตั้งทางภูมิศาสตร์และการป้องกันพื้นที่</span>
       <span class="score-badge" id="badge1">–</span>
     </div>
     <div class="indicator-body">
@@ -873,7 +881,7 @@
   <div class="indicator" id="ind2">
     <div class="indicator-header">
       <span class="indicator-num">2</span>
-      <span class="indicator-title">ความสามารถในการรับมือด้านการจัดหาน้ำ</span>
+      <span class="indicator-title" data-i18n="ind2title">ความสามารถในการรับมือด้านการจัดหาน้ำ</span>
       <span class="score-badge" id="badge2">–</span>
     </div>
     <div class="indicator-body">
@@ -913,7 +921,7 @@
   <div class="indicator" id="ind3">
     <div class="indicator-header">
       <span class="indicator-num">3</span>
-      <span class="indicator-title">ความสามารถในการรับมือด้านการจัดหาพลังงาน</span>
+      <span class="indicator-title" data-i18n="ind3title">ความสามารถในการรับมือด้านการจัดหาพลังงาน</span>
       <span class="score-badge" id="badge3">–</span>
     </div>
     <div class="indicator-body">
@@ -947,7 +955,7 @@
   <div class="indicator" id="ind4">
     <div class="indicator-header">
       <span class="indicator-num">4</span>
-      <span class="indicator-title">ความสามารถในการรักษาความต่อเนื่องของห่วงโซ่อุปทาน</span>
+      <span class="indicator-title" data-i18n="ind4title">ความสามารถในการรักษาความต่อเนื่องของห่วงโซ่อุปทาน</span>
       <span class="score-badge" id="badge4">–</span>
     </div>
     <div class="indicator-body">
@@ -985,7 +993,7 @@
   <div class="indicator" id="ind5">
     <div class="indicator-header">
       <span class="indicator-num">5</span>
-      <span class="indicator-title">ระบบข้อมูลและการเตือนภัยล่วงหน้า</span>
+      <span class="indicator-title" data-i18n="ind5title">ระบบข้อมูลและการเตือนภัยล่วงหน้า</span>
       <span class="score-badge" id="badge5">–</span>
     </div>
     <div class="indicator-body">
@@ -1015,7 +1023,7 @@
   <div class="indicator" id="ind6">
     <div class="indicator-header">
       <span class="indicator-num">6</span>
-      <span class="indicator-title">การประกันภัยที่เพียงพอและการสนับสนุนเพื่อการฟื้นฟู</span>
+      <span class="indicator-title" data-i18n="ind6title">การประกันภัยที่เพียงพอและการสนับสนุนเพื่อการฟื้นฟู</span>
       <span class="score-badge" id="badge6">–</span>
     </div>
     <div class="indicator-body">
@@ -1052,7 +1060,7 @@
   <div class="indicator" id="ind7">
     <div class="indicator-header">
       <span class="indicator-num">7</span>
-      <span class="indicator-title">การลดการปล่อยก๊าซเรือนกระจก (GHG)</span>
+      <span class="indicator-title" data-i18n="ind7title">การลดการปล่อยก๊าซเรือนกระจก (GHG)</span>
       <span class="score-badge" id="badge7">–</span>
     </div>
     <div class="indicator-body">
@@ -1081,7 +1089,7 @@
   <div class="indicator" id="ind8">
     <div class="indicator-header">
       <span class="indicator-num">8</span>
-      <span class="indicator-title">พลังงานหมุนเวียน <span class="double-weight">(น้ำหนัก×2)</span></span>
+      <span class="indicator-title" data-i18n="ind8title">พลังงานหมุนเวียน <span class="double-weight">(น้ำหนัก×2)</span></span>
       <span class="score-badge" id="badge8">–</span>
     </div>
     <div class="indicator-body">
@@ -1115,7 +1123,7 @@
   <div class="indicator" id="ind9">
     <div class="indicator-header">
       <span class="indicator-num">9</span>
-      <span class="indicator-title">ประสิทธิภาพการใช้ทรัพยากร</span>
+      <span class="indicator-title" data-i18n="ind9title">ประสิทธิภาพการใช้ทรัพยากร</span>
       <span class="score-badge" id="badge9">–</span>
     </div>
     <div class="indicator-body">
@@ -1149,7 +1157,7 @@
   <div class="indicator" id="ind10">
     <div class="indicator-header">
       <span class="indicator-num">10</span>
-      <span class="indicator-title">ผลิตภัณฑ์ยั่งยืน / ใบรับรอง <span class="double-weight">(น้ำหนัก×2)</span></span>
+      <span class="indicator-title" data-i18n="ind10title">ผลิตภัณฑ์ยั่งยืน / ใบรับรอง <span class="double-weight">(น้ำหนัก×2)</span></span>
       <span class="score-badge" id="badge10">–</span>
     </div>
     <div class="indicator-body">
@@ -1177,7 +1185,7 @@
   <div class="indicator" id="ind11">
     <div class="indicator-header">
       <span class="indicator-num">11</span>
-      <span class="indicator-title">มลพิษและการปล่อยมลสาร <span class="double-weight">(น้ำหนัก×2)</span></span>
+      <span class="indicator-title" data-i18n="ind11title">มลพิษและการปล่อยมลสาร <span class="double-weight">(น้ำหนัก×2)</span></span>
       <span class="score-badge" id="badge11">–</span>
     </div>
     <div class="indicator-body">
@@ -1211,7 +1219,7 @@
   <div class="indicator" id="ind12">
     <div class="indicator-header">
       <span class="indicator-num">12</span>
-      <span class="indicator-title">การใช้ที่ดินอย่างยั่งยืน</span>
+      <span class="indicator-title" data-i18n="ind12title">การใช้ที่ดินอย่างยั่งยืน</span>
       <span class="score-badge" id="badge12">–</span>
     </div>
     <div class="indicator-body">
@@ -1248,7 +1256,7 @@
   <div class="indicator" id="ind13">
     <div class="indicator-header">
       <span class="indicator-num">13</span>
-      <span class="indicator-title">การคุ้มครองความหลากหลายทางชีวภาพ <span class="double-weight">(น้ำหนัก×2)</span></span>
+      <span class="indicator-title" data-i18n="ind13title">การคุ้มครองความหลากหลายทางชีวภาพ <span class="double-weight">(น้ำหนัก×2)</span></span>
       <span class="score-badge" id="badge13">–</span>
     </div>
     <div class="indicator-body">
@@ -1286,7 +1294,7 @@
   <div class="indicator" id="ind14">
     <div class="indicator-header">
       <span class="indicator-num">14</span>
-      <span class="indicator-title">สุขภาพ ความปลอดภัย และสิทธิแรงงาน</span>
+      <span class="indicator-title" data-i18n="ind14title">สุขภาพ ความปลอดภัย และสิทธิแรงงาน</span>
       <span class="score-badge" id="badge14">–</span>
     </div>
     <div class="indicator-body">
@@ -2123,9 +2131,11 @@ const translations = {
   th: {
     mainTitle: 'ธ.ก.ส. · แบบประเมิน ESG Due Diligence (ฉบับย่อ V3)',
     mainSubtitle: 'กลุ่มเป้าหมาย: เกษตรกรผู้ปลูกข้าว | รายย่อย (S1) · คะแนน 0 / 0.25 / 0.5 / 0.75 / 1.0 · ภาคเกษตร',
+    openTip: '📱 วิธีเปิดบนมือถือให้ใช้งานได้ครบ<br>• อย่าเปิดจากแอปเมลโดยตรง (ปุ่มและคำนวณจะไม่ทำงาน)<br>• iPhone: บันทึกไฟล์ลงแอป Files → แชร์ → เปิดใน Safari<br>• วิธีดีที่สุด: เปิดผ่านลิงก์ GitHub Pages',
     cifTitle: '🔑 โหลด / บันทึกข้อมูลด้วย CIF',
     loadBtn: 'โหลดข้อมูล',
     saveBtn: 'บันทึกข้อมูล',
+    cifHelp: '• ครั้งแรก: กรอก CIF แล้วกรอกข้อมูล → กด <strong>บันทึกข้อมูล</strong><br>• ครั้งต่อไป: กรอก CIF แล้วกด <strong>โหลดข้อมูล</strong>',
     farmerSection: 'ข้อมูลเกษตรกร / เจ้าหน้าที่',
     farmerName: 'ชื่อ-นามสกุล เกษตรกร',
     loanId: 'เลขที่สัญญา / รหัสลูกค้า (CIF)',
@@ -2133,31 +2143,157 @@ const translations = {
     area: 'พื้นที่เพาะปลูก (ไร่)',
     assessDate: 'วันที่ประเมิน',
     officerName: 'ชื่อเจ้าหน้าที่สินเชื่อ',
-    agriType: 'ประเภทพืช / กิจกรรมเกษตร (Industry)',
-    sectorScore: 'คะแนนความเสี่ยงภาคเศรษฐกิจ (Sector ESG Score 0–6)'
+    agriType: 'ประเภทพืช / กิจกรรมเกษตร',
+    sectorScore: 'คะแนนความเสี่ยงภาคเศรษฐกิจ (0–6)',
+    sectionA: 'ก) ความสามารถในการรับมือและปรับตัวต่อความเสี่ยงทางกายภาพด้านสภาพภูมิอากาศ',
+    sectionB: 'ข) ความสามารถในการรับมือของรายบุคคลต่อความเสี่ยงจากการเปลี่ยนผ่าน',
+    sectionC: 'ค) การบริหารความเสี่ยงด้านสิ่งแวดล้อมและสังคม',
+    riskExplain: `<strong style="color:#1b5e20;">คำอธิบายง่ายๆ ระดับความเสี่ยงของพื้นที่</strong>
+            <ul style="margin:.45rem 0 0 1.1rem; padding:0; line-height:1.55;">
+              <li><strong>พื้นที่เสี่ยงสูง</strong> — น้ำท่วมบ่อย หรือแล้งบ่อย หรือร้อนจัดจนผลผลิตเสียหายบ่อย</li>
+              <li><strong>พื้นที่เสี่ยงปานกลาง</strong> — เคยมีน้ำท่วมหรือแล้งบ้าง แต่ไม่ทุกปี</li>
+              <li><strong>พื้นที่เสี่ยงต่ำ</strong> — น้ำท่วม/แล้งน้อย อยู่ในเขตชลประทานที่ดี</li>
+              <li><strong>ข้าวภาคกลาง</strong> — ใช้เมื่อไม่แน่ใจ</li>
+            </ul>
+            <p style="margin:.4rem 0 0; color:#555; font-size:.82rem;">ถ้าไม่แน่ใจ ให้ถามเกษตรกรว่า “ปีที่ผ่านมา น้ำท่วมหรือแล้งจนเสียหายบ่อยไหม?”</p>`,
+    abbrBox: `<strong style="color:#f57f17;">คำย่อที่พบบ่อย</strong>
+            <ul style="margin:.4rem 0 0 1.1rem; padding:0; line-height:1.55;">
+              <li><strong>TRIS</strong> = ประกันภัยข้าวของเกษตรกร</li>
+              <li><strong>NDS</strong> = ประกันภัยพิบัติแห่งชาติ</li>
+              <li><strong>AWD</strong> = ทำนาแบบเปียกสลับแห้ง</li>
+              <li><strong>DSR</strong> = หว่านข้าวแห้ง</li>
+              <li><strong>LLL</strong> = ปรับระดับดินด้วยเลเซอร์</li>
+              <li><strong>SSNM</strong> = ใส่ปุ๋ยตามค่าดิน</li>
+              <li><strong>IPM</strong> = จัดการศัตรูพืชแบบผสมผสาน</li>
+              <li><strong>CAP</strong> = แผนปฏิบัติการแก้ไข</li>
+            </ul>`,
+    ind1title: 'ที่ตั้งทางภูมิศาสตร์และการป้องกันพื้นที่',
+    ind2title: 'ความสามารถในการรับมือด้านการจัดหาน้ำ',
+    ind3title: 'ความสามารถในการรับมือด้านการจัดหาพลังงาน',
+    ind4title: 'ความสามารถในการรักษาความต่อเนื่องของห่วงโซ่อุปทาน',
+    ind5title: 'ระบบข้อมูลและการเตือนภัยล่วงหน้า',
+    ind6title: 'การประกันภัยที่เพียงพอและการสนับสนุนเพื่อการฟื้นฟู',
+    ind7title: 'การลดการปล่อยก๊าซเรือนกระจก (GHG)',
+    ind8title: 'พลังงานหมุนเวียน <span class="double-weight">(น้ำหนัก×2)</span>',
+    ind9title: 'ประสิทธิภาพการใช้ทรัพยากร',
+    ind10title: 'ผลิตภัณฑ์ยั่งยืน / ใบรับรอง <span class="double-weight">(น้ำหนัก×2)</span>',
+    ind11title: 'มลพิษและการปล่อยมลสาร <span class="double-weight">(น้ำหนัก×2)</span>',
+    ind12title: 'การใช้ที่ดินอย่างยั่งยืน',
+    ind13title: 'การคุ้มครองความหลากหลายทางชีวภาพ <span class="double-weight">(น้ำหนัก×2)</span>',
+    ind14title: 'สุขภาพ ความปลอดภัย และสิทธิแรงงาน',
+    phCif: 'กรอก CIF หรือเลขที่สัญญา',
+    phFarmer: 'ชื่อเกษตรกร',
+    phLoan: 'เช่น BAAC-XXXX หรือ CIF',
+    phLocation: 'จังหวัด อำเภอ',
+    phArea: 'จำนวนไร่',
+    phOfficer: 'ชื่อเจ้าหน้าที่',
+    phNotes: 'บันทึกหลักฐาน เช่น ภาพถ่าย, ใบเสร็จ, เอกสารประกัน, ใบรับรอง ฯลฯ',
+    haNote: '1 เฮกตาร์ = 6.25 ไร่',
+    autoNote: 'ระบบจะตั้งค่าให้อัตโนมัติตามประเภทพืช แต่คุณสามารถเปลี่ยนเองได้',
+    haDisplay: '= – เฮกตาร์',
+    resultsTitle: 'ผลการประเมิน ESG',
+    calcBtn: 'คำนวณคะแนน & อัปเดต Matrix',
+    clearBtn: 'ล้างข้อมูล',
+    printBtn: 'พิมพ์ / PDF',
+    excelBtn: 'ส่งออก Excel',
+    pngBtn: 'ส่งออก PNG',
+    matrixTitle: 'เมทริกซ์การตัดสินใจด้าน ESG (ESG Risk Decision Matrix)',
+    ddScoreLabel: 'คะแนน DD โดยรวม (0–1) · ตัวปรับ Residual',
+    residualLabel: 'Residual ESG Risk Score (6 − คะแนน DD × 6)',
+    notesText: 'คะแนนที่ใช้: 0 / 0.25 / 0.5 / 0.75 / 1.0 · ตัวชี้วัดน้ำหนัก×2: 8, 10, 11, 13 · Residual = 6 − (คะแนน DD × 6)',
+    zoneBadge: 'ยังไม่ประเมิน',
+    matrixPos: 'ตำแหน่งบนเมทริกซ์ (0–6)',
+    coordLabel: 'พิกัดโดยประมาณ:',
+    blueDotLabel: 'จุดสีน้ำเงินบนตาราง = ตำแหน่งของเกษตรกรรายนี้',
+    riskDetail: 'รายละเอียดความเสี่ยง',
+    measuresTitle: 'มาตรการลดความเสี่ยง / การสนับสนุนลูกค้า (ภาคเกษตร)'
   },
   en: {
     mainTitle: 'BAAC · ESG Due Diligence Assessment (Short Version V3)',
     mainSubtitle: 'Target: Smallholder rice farmers (S1) · Score 0 / 0.25 / 0.5 / 0.75 / 1.0 · Agriculture',
+    openTip: '📱 How to open correctly on mobile<br>• Do not open directly from email/Line (buttons will not work)<br>• iPhone: Save to Files app → Share → Open in Safari<br>• Best: Open via the GitHub Pages link',
     cifTitle: '🔑 Load / Save data with CIF',
-    loadBtn: 'Load Data',
-    saveBtn: 'Save Data',
+    loadBtn: 'Load',
+    saveBtn: 'Save',
+    cifHelp: '• First time: Enter CIF, fill the form → press <strong>Save</strong><br>• Next time: Enter CIF → press <strong>Load</strong>',
     farmerSection: 'Farmer / Officer Information',
-    farmerName: 'Farmer Name',
+    farmerName: 'Farmer Full Name',
     loanId: 'Loan No. / Customer ID (CIF)',
     location: 'Province / District',
     area: 'Farm Area (rai)',
     assessDate: 'Assessment Date',
     officerName: 'Credit Officer Name',
-    agriType: 'Crop Type / Agricultural Activity',
-    sectorScore: 'Sector ESG Score (0–6)'
+    agriType: 'Crop Type / Activity',
+    sectorScore: 'Sector ESG Score (0–6)',
+    sectionA: 'A) Individual Resilience against Physical Climate Risk',
+    sectionB: 'B) Individual Resilience against Transition Risk',
+    sectionC: 'C) Environmental & Social Risk Management',
+    riskExplain: `<strong style="color:#1b5e20;">Simple explanation of area risk level</strong>
+            <ul style="margin:.45rem 0 0 1.1rem; padding:0; line-height:1.55;">
+              <li><strong>High risk</strong> — Frequent flooding, drought, or extreme heat that often damages yield</li>
+              <li><strong>Medium risk</strong> — Occasional flooding or drought, but not every year</li>
+              <li><strong>Low risk</strong> — Little flooding/drought, good irrigation</li>
+              <li><strong>Central plains rice</strong> — Use when unsure</li>
+            </ul>
+            <p style="margin:.4rem 0 0; color:#555; font-size:.82rem;">If unsure, ask the farmer: “Did flooding or drought often damage your crop last year?”</p>`,
+    abbrBox: `<strong style="color:#f57f17;">Common abbreviations</strong>
+            <ul style="margin:.4rem 0 0 1.1rem; padding:0; line-height:1.55;">
+              <li><strong>TRIS</strong> = Thai Rice Insurance Scheme</li>
+              <li><strong>NDS</strong> = National Disaster Support</li>
+              <li><strong>AWD</strong> = Alternate Wetting and Drying</li>
+              <li><strong>DSR</strong> = Direct Seeded Rice (dry seeding)</li>
+              <li><strong>LLL</strong> = Laser Land Leveling</li>
+              <li><strong>SSNM</strong> = Site-Specific Nutrient Management</li>
+              <li><strong>IPM</strong> = Integrated Pest Management</li>
+              <li><strong>CAP</strong> = Corrective Action Plan</li>
+            </ul>`,
+    ind1title: 'Geographic location and site protection',
+    ind2title: 'Water supply resilience',
+    ind3title: 'Energy supply resilience',
+    ind4title: 'Supply chain resilience',
+    ind5title: 'Information and early warning systems',
+    ind6title: 'Adequate insurance and recovery support',
+    ind7title: 'Reducing CO₂ and GHG emissions',
+    ind8title: 'Renewable energy <span class="double-weight">(weight ×2)</span>',
+    ind9title: 'Resource efficiency',
+    ind10title: 'Sustainable products / certificates <span class="double-weight">(weight ×2)</span>',
+    ind11title: 'Pollution and emissions <span class="double-weight">(weight ×2)</span>',
+    ind12title: 'Sustainable land use',
+    ind13title: 'Biodiversity protection <span class="double-weight">(weight ×2)</span>',
+    ind14title: 'Health, safety and workers’ rights',
+    phCif: 'Enter CIF or contract number',
+    phFarmer: 'Farmer name',
+    phLoan: 'e.g. BAAC-XXXX or CIF',
+    phLocation: 'Province / District',
+    phArea: 'Area in rai',
+    phOfficer: 'Officer name',
+    phNotes: 'Evidence notes: photos, receipts, insurance docs, certificates, etc.',
+    haNote: '1 hectare = 6.25 rai',
+    autoNote: 'Auto-filled based on crop type, but you can change it manually',
+    haDisplay: '= – hectare',
+    resultsTitle: 'ESG Assessment Results',
+    calcBtn: 'Calculate Score & Update Matrix',
+    clearBtn: 'Clear Data',
+    printBtn: 'Print / PDF',
+    excelBtn: 'Export Excel',
+    pngBtn: 'Export PNG',
+    matrixTitle: 'ESG Risk Decision Matrix',
+    ddScoreLabel: 'Total DD Score (0–1) · Residual adjustment',
+    residualLabel: 'Residual ESG Risk Score (6 − DD score × 6)',
+    notesText: 'Scores used: 0 / 0.25 / 0.5 / 0.75 / 1.0 · Weight ×2: 8, 10, 11, 13 · Residual = 6 − (DD × 6)',
+    zoneBadge: 'Not yet assessed',
+    matrixPos: 'Position on matrix (0–6)',
+    riskDetail: 'Risk details',
+    measuresTitle: 'Risk mitigation measures / Client support (Agriculture)'
   },
   de: {
     mainTitle: 'BAAC · ESG Due Diligence Bewertung (Kurzversion V3)',
     mainSubtitle: 'Zielgruppe: Kleinbauern Reis (S1) · Punkte 0 / 0.25 / 0.5 / 0.75 / 1.0 · Landwirtschaft',
+    openTip: '📱 So öffnen Sie die Datei korrekt auf dem Handy<br>• Nicht direkt aus E-Mail/Line öffnen<br>• iPhone: In Files speichern → Teilen → In Safari öffnen<br>• Am besten: Über den GitHub Pages Link öffnen',
     cifTitle: '🔑 Daten mit CIF laden / speichern',
-    loadBtn: 'Daten laden',
-    saveBtn: 'Daten speichern',
+    loadBtn: 'Laden',
+    saveBtn: 'Speichern',
+    cifHelp: '• Erstes Mal: CIF eingeben, Formular ausfüllen → <strong>Speichern</strong><br>• Danach: CIF eingeben → <strong>Laden</strong>',
     farmerSection: 'Landwirt / Mitarbeiter Informationen',
     farmerName: 'Name des Landwirts',
     loanId: 'Vertragsnr. / Kunden-ID (CIF)',
@@ -2165,8 +2301,70 @@ const translations = {
     area: 'Anbaufläche (Rai)',
     assessDate: 'Bewertungsdatum',
     officerName: 'Name des Kreditmitarbeiters',
-    agriType: 'Pflanzenart / landwirtschaftliche Tätigkeit',
-    sectorScore: 'Sektor ESG Score (0–6)'
+    agriType: 'Pflanzenart / Tätigkeit',
+    sectorScore: 'Sektor ESG Score (0–6)',
+    sectionA: 'A) Individuelle Resilienz gegen physische Klimarisiken',
+    sectionB: 'B) Individuelle Resilienz gegen Transitionsrisiken',
+    sectionC: 'C) Umwelt- und Sozialrisikomanagement',
+    riskExplain: `<strong style="color:#1b5e20;">Einfache Erklärung des Risikolevels</strong>
+            <ul style="margin:.45rem 0 0 1.1rem; padding:0; line-height:1.55;">
+              <li><strong>Hohes Risiko</strong> — Häufige Überschwemmungen, Dürre oder extreme Hitze</li>
+              <li><strong>Mittleres Risiko</strong> — Gelegentliche Überschwemmung oder Dürre</li>
+              <li><strong>Niedriges Risiko</strong> — Wenig Überschwemmung/Dürre, gute Bewässerung</li>
+              <li><strong>Zentraler Reisanbau</strong> — Bei Unsicherheit verwenden</li>
+            </ul>
+            <p style="margin:.4rem 0 0; color:#555; font-size:.82rem;">Wenn unsicher: „Hatten Sie letztes Jahr oft Überschwemmung oder Dürre?“ fragen</p>`,
+    abbrBox: `<strong style="color:#f57f17;">Häufige Abkürzungen</strong>
+            <ul style="margin:.4rem 0 0 1.1rem; padding:0; line-height:1.55;">
+              <li><strong>TRIS</strong> = Thai Rice Insurance Scheme</li>
+              <li><strong>NDS</strong> = National Disaster Support</li>
+              <li><strong>AWD</strong> = Alternate Wetting and Drying (abwechselnd nass/trocken)</li>
+              <li><strong>DSR</strong> = Direct Seeded Rice (Trockenaussaat)</li>
+              <li><strong>LLL</strong> = Laser Land Leveling</li>
+              <li><strong>SSNM</strong> = Standortspezifische Nährstoffmanagement</li>
+              <li><strong>IPM</strong> = Integrierter Pflanzenschutz</li>
+              <li><strong>CAP</strong> = Korrekturmaßnahmenplan</li>
+            </ul>`,
+    ind1title: 'Geografische Lage und Flächenschutz',
+    ind2title: 'Wasserversorgungsresilienz',
+    ind3title: 'Energieversorgungsresilienz',
+    ind4title: 'Lieferkettenresilienz',
+    ind5title: 'Informations- und Frühwarnsysteme',
+    ind6title: 'Ausreichende Versicherung und Wiederherstellung',
+    ind7title: 'Reduzierung von CO₂- und Treibhausgasemissionen',
+    ind8title: 'Erneuerbare Energie <span class="double-weight">(Gewicht ×2)</span>',
+    ind9title: 'Ressourceneffizienz',
+    ind10title: 'Nachhaltige Produkte / Zertifikate <span class="double-weight">(Gewicht ×2)</span>',
+    ind11title: 'Verschmutzung und Emissionen <span class="double-weight">(Gewicht ×2)</span>',
+    ind12title: 'Nachhaltige Landnutzung',
+    ind13title: 'Schutz der Biodiversität <span class="double-weight">(Gewicht ×2)</span>',
+    ind14title: 'Gesundheit, Sicherheit und Arbeitnehmerrechte',
+    phCif: 'CIF oder Vertragsnummer eingeben',
+    phFarmer: 'Name des Landwirts',
+    phLoan: 'z.B. BAAC-XXXX oder CIF',
+    phLocation: 'Provinz / Bezirk',
+    phArea: 'Fläche in Rai',
+    phOfficer: 'Name des Mitarbeiters',
+    phNotes: 'Nachweisnotizen: Fotos, Quittungen, Versicherungsdokumente, Zertifikate usw.',
+    haNote: '1 Hektar = 6,25 Rai',
+    autoNote: 'Wird automatisch nach Pflanzenart gesetzt, kann aber manuell geändert werden',
+    haDisplay: '= – Hektar',
+    resultsTitle: 'ESG-Bewertungsergebnisse',
+    calcBtn: 'Punkte berechnen & Matrix aktualisieren',
+    clearBtn: 'Daten löschen',
+    printBtn: 'Drucken / PDF',
+    excelBtn: 'Excel exportieren',
+    pngBtn: 'PNG exportieren',
+    matrixTitle: 'ESG-Risiko-Entscheidungsmatrix',
+    ddScoreLabel: 'Gesamtpunktzahl DD (0–1) · Residual-Anpassung',
+    residualLabel: 'Residual ESG Risk Score (6 − DD-Punktzahl × 6)',
+    notesText: 'Verwendete Punkte: 0 / 0,25 / 0,5 / 0,75 / 1,0 · Gewicht ×2: 8, 10, 11, 13 · Residual = 6 − (DD × 6)',
+    zoneBadge: 'Noch nicht bewertet',
+    matrixPos: 'Position auf der Matrix (0–6)',
+    coordLabel: 'Ungefähre Koordinaten:',
+    blueDotLabel: 'Blauer Punkt auf der Tabelle = Position dieses Landwirts',
+    riskDetail: 'Risikodetails',
+    measuresTitle: 'Risikominderungsmaßnahmen / Kundenunterstützung (Landwirtschaft)'
   }
 };
 
@@ -2176,34 +2374,619 @@ function setLang(lang) {
   currentLang = lang;
   const t = translations[lang] || translations.th;
 
-  document.getElementById('mainTitle').textContent = t.mainTitle;
-  document.getElementById('mainSubtitle').textContent = t.mainSubtitle;
+  try {
+    document.getElementById('mainTitle').textContent = t.mainTitle || '';
+    document.getElementById('mainSubtitle').textContent = t.mainSubtitle || '';
 
-  // CIF section
-  const cifTitle = document.querySelector('.card-body div[style*="background:#e3f2fd"] div');
-  if (cifTitle) cifTitle.innerHTML = t.cifTitle;
+    const openTip = document.getElementById('openTip');
+    if (openTip && t.openTip) openTip.innerHTML = t.openTip;
 
-  const buttons = document.querySelectorAll('.card-body button');
-  if (buttons[0]) buttons[0].textContent = t.loadBtn;
-  if (buttons[1]) buttons[1].textContent = t.saveBtn;
+    const cifBox = document.querySelector('div[style*="background:#e3f2fd"]');
+    if (cifBox) {
+      const titleEl = cifBox.querySelector('div');
+      if (titleEl && t.cifTitle) titleEl.innerHTML = t.cifTitle;
+      const btns = cifBox.querySelectorAll('button');
+      if (btns[0] && t.loadBtn) btns[0].textContent = t.loadBtn;
+      if (btns[1] && t.saveBtn) btns[1].textContent = t.saveBtn;
+      const help = cifBox.querySelector('p');
+      if (help && t.cifHelp) help.innerHTML = t.cifHelp;
+    }
 
-  // Farmer info labels
-  document.querySelector('.card-header').textContent = t.farmerSection;
-  const labels = document.querySelectorAll('.farmer-info label');
-  if (labels[0]) labels[0].textContent = t.farmerName;
-  if (labels[1]) labels[1].textContent = t.loanId;
-  if (labels[2]) labels[2].textContent = t.location;
-  if (labels[3]) labels[3].textContent = t.area;
-  if (labels[4]) labels[4].textContent = t.assessDate;
-  if (labels[5]) labels[5].textContent = t.officerName;
-  if (labels[6]) labels[6].textContent = t.agriType;
-  if (labels[7]) labels[7].textContent = t.sectorScore;
+    const firstCardHeader = document.querySelector('.card-header');
+    if (firstCardHeader && t.farmerSection) firstCardHeader.textContent = t.farmerSection;
 
-  // Update active button
-  document.querySelectorAll('.lang-switch button').forEach(btn => btn.classList.remove('active'));
-  document.getElementById('btn-' + lang).classList.add('active');
+    const labels = document.querySelectorAll('.farmer-info label');
+    const labelKeys = ['farmerName','loanId','location','area','assessDate','officerName','agriType','sectorScore'];
+    labels.forEach((lb, i) => {
+      if (labelKeys[i] && t[labelKeys[i]]) lb.textContent = t[labelKeys[i]];
+    });
 
-  document.documentElement.lang = lang === 'th' ? 'th' : lang;
+    const sectionTitles = document.querySelectorAll('.section-title');
+    if (sectionTitles[0] && t.sectionA) sectionTitles[0].textContent = t.sectionA;
+    if (sectionTitles[1] && t.sectionB) sectionTitles[1].textContent = t.sectionB;
+    if (sectionTitles[2] && t.sectionC) sectionTitles[2].textContent = t.sectionC;
+
+    const riskBox = document.getElementById('riskExplainBox');
+    if (riskBox && t.riskExplain) riskBox.innerHTML = t.riskExplain;
+    const abbr = document.getElementById('abbrBox');
+    if (abbr && t.abbrBox) abbr.innerHTML = t.abbrBox;
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.innerHTML = t[key];
+    });
+
+    const phMap = {
+      cifInput: t.phCif, farmerName: t.phFarmer, loanId: t.phLoan,
+      location: t.phLocation, area: t.phArea, officerName: t.phOfficer, notes: t.phNotes
+    };
+    Object.keys(phMap).forEach(id => {
+      const el = document.getElementById(id);
+      if (el && phMap[id]) el.placeholder = phMap[id];
+    });
+
+    const haDisp = document.getElementById('haDisplay');
+    if (haDisp && t.haDisplay) haDisp.textContent = t.haDisplay;
+
+    if (typeof translateIndicatorBodies === 'function') translateIndicatorBodies(lang);
+    if (typeof translateSelectOptions === 'function') translateSelectOptions(lang);
+
+    // Force update results buttons
+    const calcBtn = document.querySelector('button[onclick*="calculate"]');
+    if (calcBtn && t.calcBtn) calcBtn.textContent = t.calcBtn;
+    const clearBtn = document.querySelector('button[onclick*="resetForm"]');
+    if (clearBtn && t.clearBtn) clearBtn.textContent = t.clearBtn;
+    const printBtn = document.querySelector('button[onclick*="window.print"]');
+    if (printBtn && t.printBtn) printBtn.textContent = t.printBtn;
+    const excelBtn = document.querySelector('button[onclick*="exportExcel"]');
+    if (excelBtn && t.excelBtn) excelBtn.textContent = t.excelBtn;
+    const pngBtn = document.querySelector('button[onclick*="exportPNG"]');
+    if (pngBtn && t.pngBtn) pngBtn.textContent = t.pngBtn;
+
+    // Radar labels
+    if (typeof updateRadarLabels === 'function') updateRadarLabels(lang);
+    if (typeof translateZoneContent === 'function') translateZoneContent(lang);
+
+    // Force refresh zone display if already calculated
+    if (typeof updateZoneInfo === 'function' && typeof getZone === 'function') {
+      const sector = getSectorScore();
+      const residual = parseFloat(document.getElementById('residualScore')?.textContent) || 0;
+      const zoneKey = getZone(sector, residual);
+      if (zoneKey) updateZoneInfo(zoneKey);
+    }
+
+    const resultsSpan = document.getElementById('resultsTitleSpan');
+    if (resultsSpan && t.resultsTitle) resultsSpan.textContent = t.resultsTitle;
+    const matrixTitle = document.querySelector('.matrix-title');
+    if (matrixTitle && t.matrixTitle) matrixTitle.textContent = t.matrixTitle;
+
+    // Additional results texts
+    const ddLabel = document.querySelector('.big-score .label');
+    if (ddLabel && t.ddScoreLabel) ddLabel.textContent = t.ddScoreLabel;
+    const residualLabel = document.querySelector('div[style*="Residual ESG Risk Score"]');
+    if (residualLabel && t.residualLabel) residualLabel.textContent = t.residualLabel;
+    const notes = document.querySelector('.results-body .notes');
+    if (notes && t.notesText) notes.textContent = t.notesText;
+    const zoneBadge = document.getElementById('zoneBadge');
+    if (zoneBadge && t.zoneBadge && zoneBadge.textContent.includes('ยังไม่')) zoneBadge.textContent = t.zoneBadge;
+    const matrixPos = document.getElementById('matrixPosTitle');
+    if (matrixPos && t.matrixPos) matrixPos.textContent = t.matrixPos;
+    const coordLabel = document.getElementById('coordLabel');
+    if (coordLabel && t.coordLabel) coordLabel.textContent = t.coordLabel;
+    const blueDot = document.getElementById('blueDotLabel');
+    if (blueDot && t.blueDotLabel) blueDot.textContent = t.blueDotLabel;
+
+    document.querySelectorAll('.lang-switch button').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById('btn-' + lang);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    document.documentElement.lang = lang === 'th' ? 'th' : lang;
+  } catch (err) {
+    console.error('setLang error:', err);
+  }
+}
+
+function translateSelectOptions(lang) {
+  const agri = document.getElementById('agriType');
+  const sector = document.getElementById('sectorScore');
+  if (!agri || !sector) return;
+
+  const agriLabels = {
+    th: {
+      rice_central: 'ข้าวนาปี/นาปรัง – ภาคกลาง (ค่าเริ่มต้น)',
+      rice_high: 'ข้าว – พื้นที่เสี่ยงสูง (น้ำท่วม/แล้งบ่อย)',
+      rice_med: 'ข้าว – พื้นที่เสี่ยงปานกลาง',
+      rice_low: 'ข้าว – พื้นที่เสี่ยงต่ำ / ชลประทานดี',
+      rice_northeast: 'ข้าว – ภาคอีสาน',
+      rice_north: 'ข้าว – ภาคเหนือ',
+      rice_south: 'ข้าว – ภาคใต้',
+      cassava: 'มันสำปะหลัง',
+      sugarcane: 'อ้อย',
+      maize: 'ข้าวโพด',
+      rubber: 'ยางพารา',
+      palm: 'ปาล์มน้ำมัน',
+      fruit: 'ผลไม้ / พืชสวน',
+      other_crop: 'พืชไร่ / พืชสวน อื่นๆ',
+      livestock: 'ปศุสัตว์ (ไก่ หมู วัว)',
+      fishery: 'ประมง / กุ้ง',
+      mixed: 'เกษตรผสมผสาน',
+      other: 'อื่นๆ'
+    },
+    en: {
+      rice_central: 'Rice (wet/dry season) – Central Plains (default)',
+      rice_high: 'Rice – High risk area (frequent flood/drought)',
+      rice_med: 'Rice – Medium risk area',
+      rice_low: 'Rice – Low risk / good irrigation',
+      rice_northeast: 'Rice – Northeast',
+      rice_north: 'Rice – North',
+      rice_south: 'Rice – South',
+      cassava: 'Cassava',
+      sugarcane: 'Sugarcane',
+      maize: 'Maize',
+      rubber: 'Rubber',
+      palm: 'Oil palm',
+      fruit: 'Fruit / Orchard',
+      other_crop: 'Other field / horticultural crops',
+      livestock: 'Livestock (chicken, pig, cattle)',
+      fishery: 'Fishery / Shrimp',
+      mixed: 'Mixed farming',
+      other: 'Other'
+    },
+    de: {
+      rice_central: 'Reis (Nass-/Trockenzeit) – Zentralebene (Standard)',
+      rice_high: 'Reis – Hochrisikogebiet (häufig Überschwemmung/Dürre)',
+      rice_med: 'Reis – Mittleres Risiko',
+      rice_low: 'Reis – Niedriges Risiko / gute Bewässerung',
+      rice_northeast: 'Reis – Nordosten',
+      rice_north: 'Reis – Norden',
+      rice_south: 'Reis – Süden',
+      cassava: 'Maniok',
+      sugarcane: 'Zuckerrohr',
+      maize: 'Mais',
+      rubber: 'Kautschuk',
+      palm: 'Ölpalme',
+      fruit: 'Obst / Obstgarten',
+      other_crop: 'Andere Feld- / Gartenkulturen',
+      livestock: 'Viehzucht (Huhn, Schwein, Rind)',
+      fishery: 'Fischerei / Garnelen',
+      mixed: 'Gemischte Landwirtschaft',
+      other: 'Sonstiges'
+    }
+  };
+
+  const sectorLabels = {
+    th: {
+      '5.0': '5.0 – ข้าวพื้นที่เสี่ยงสูง',
+      '4.5': '4.5 – ข้าวภาคกลาง (ค่าเริ่มต้น)',
+      '4.2': '4.2 – ข้าวภาคอีสาน / เหนือ',
+      '4.0': '4.0 – ข้าวพื้นที่เสี่ยงปานกลาง',
+      '3.5': '3.5 – ข้าวพื้นที่เสี่ยงต่ำ',
+      '5.2': '5.2 – มันสำปะหลัง / อ้อย (เสี่ยงสูง)',
+      '4.8': '4.8 – พืชไร่ทั่วไป',
+      '4.3': '4.3 – ยางพารา / ปาล์ม',
+      '3.9': '3.9 – ผลไม้ / พืชสวน',
+      '3.8': '3.8 – ปศุสัตว์',
+      '4.1': '4.1 – ประมง / กุ้ง',
+      '3.0': '3.0 – อื่นๆ / ความเสี่ยงต่ำ',
+      '6.0': '6.0 – ความเสี่ยงสูงสุด',
+      '1.0': '1.0 – ความเสี่ยงต่ำมาก'
+    },
+    en: {
+      '5.0': '5.0 – Rice high risk area',
+      '4.5': '4.5 – Central plains rice (default)',
+      '4.2': '4.2 – Northeast / North rice',
+      '4.0': '4.0 – Medium risk rice',
+      '3.5': '3.5 – Low risk rice',
+      '5.2': '5.2 – Cassava / sugarcane (high risk)',
+      '4.8': '4.8 – General field crops',
+      '4.3': '4.3 – Rubber / oil palm',
+      '3.9': '3.9 – Fruit / orchard',
+      '3.8': '3.8 – Livestock',
+      '4.1': '4.1 – Fishery / shrimp',
+      '3.0': '3.0 – Other / low risk',
+      '6.0': '6.0 – Highest risk',
+      '1.0': '1.0 – Very low risk'
+    },
+    de: {
+      '5.0': '5.0 – Reis Hochrisikogebiet',
+      '4.5': '4.5 – Reis Zentralebene (Standard)',
+      '4.2': '4.2 – Nordost-/Nord-Reis',
+      '4.0': '4.0 – Mittleres Risiko Reis',
+      '3.5': '3.5 – Niedriges Risiko Reis',
+      '5.2': '5.2 – Maniok / Zuckerrohr (hohes Risiko)',
+      '4.8': '4.8 – Allgemeine Feldkulturen',
+      '4.3': '4.3 – Kautschuk / Ölpalme',
+      '3.9': '3.9 – Obst / Obstgarten',
+      '3.8': '3.8 – Viehzucht',
+      '4.1': '4.1 – Fischerei / Garnelen',
+      '3.0': '3.0 – Sonstiges / niedriges Risiko',
+      '6.0': '6.0 – Höchstes Risiko',
+      '1.0': '1.0 – Sehr niedriges Risiko'
+    }
+  };
+
+  const labels = agriLabels[lang] || agriLabels.th;
+  Array.from(agri.options).forEach(opt => {
+    if (labels[opt.value]) opt.textContent = labels[opt.value];
+  });
+
+  const sLabels = sectorLabels[lang] || sectorLabels.th;
+  Array.from(sector.options).forEach(opt => {
+    if (sLabels[opt.value]) opt.textContent = sLabels[opt.value];
+  });
+}
+function translateZoneContent(lang) {
+  if (lang === 'th' || typeof zoneContent === 'undefined') return;
+
+  const content = {
+    de: {
+      low: {
+        name: 'NIEDRIGES Risiko',
+        risk: `<h4>Risikodetails – Niedrige Zone</h4><ul><li>Der Landwirt hat in mehreren Bereichen gute Anpassungsmaßnahmen im Vergleich zum Sektorrisiko.</li><li>Auswirkungen von Naturkatastrophen und Transitionsrisiken sind akzeptabel.</li><li>Kreditrisiko aus ESG-Faktoren ist niedrig.</li></ul>`,
+        mitigation: `<h4>Was der Landwirt tun kann (einfach → schwieriger)</h4><ul><li><strong>Einfach:</strong> Wetterberichte hören / Line-Gruppen beitreten.</li><li><strong>Einfach:</strong> Dünger- und Chemikalienverwendung dokumentieren.</li><li><strong>Mittel:</strong> Kurze Reissorte in Risikoperioden verwenden.</li><li><strong>Mittel:</strong> Kein Verbrennen von Stroh – unterpflügen.</li><li><strong>Zusätzlich:</strong> TRIS-Versicherung oder SRP/TAS-Zertifikat in Betracht ziehen.</li></ul><p style="margin-top:.5rem;font-size:.82rem;color:#555;"><strong>Bank:</strong> Standardkreditprozess · Informationen zu Anpassungsmaßnahmen bereitstellen.</p>`
+      },
+      med: {
+        name: 'MITTLERES Risiko',
+        risk: `<h4>Risikodetails – Mittlere Zone</h4><ul><li>Teilweise Anpassungsmaßnahmen vorhanden, aber Lücken bestehen.</li><li>Mögliche Auswirkungen durch Dürre, Überschwemmung oder steigende Kosten.</li><li>Zusätzliche Überwachung und Unterstützung empfohlen.</li></ul>`,
+        mitigation: `<h4>Was der Landwirt tun kann (einfach → schwieriger)</h4><ul><li><strong>Einfach:</strong> TRIS (Stufe 1/2) + NDS beantragen.</li><li><strong>Einfach:</strong> Strohverbrennung stoppen.</li><li><strong>Mittel:</strong> AWD statt Dauerflutung anwenden.</li><li><strong>Mittel:</strong> Nur registrierte Chemikalien + IPM verwenden.</li><li><strong>Schwieriger:</strong> Laser Land Leveling (LLL) anwenden.</li></ul><p style="margin-top:.5rem;font-size:.82rem;color:#555;"><strong>Bank:</strong> Regelmäßige Nachverfolgung · Unterstützung bei Anpassungsmaßnahmen.</p>`
+      },
+      high: {
+        name: 'HOHES Risiko',
+        risk: `<h4>Risikodetails – Hohe Zone</h4><ul><li>Wenige Anpassungsmaßnahmen und/oder hohes Sektorrisiko.</li><li>Erhöhtes Risiko signifikanter Einkommensverluste.</li><li>Aktives Management erforderlich.</li></ul>`,
+        mitigation: `<h4>Was der Landwirt tun muss (einfach → schwieriger)</h4><ul><li><strong>Einfach (sofort):</strong> TRIS + NDS vor der Saison abschließen.</li><li><strong>Einfach (sofort):</strong> Strohverbrennung stoppen + nur registrierte Chemikalien verwenden.</li><li><strong>Mittel:</strong> Auf AWD oder DSR umstellen.</li><li><strong>Mittel:</strong> SSNM + IPM anwenden.</li><li><strong>Schwieriger:</strong> Wasserquellen verbessern (Speicher, Bewässerung, Solar).</li></ul><p style="margin-top:.5rem;font-size:.82rem;color:#555;"><strong>Bank:</strong> CAP empfohlen · Quartalsweise Nachverfolgung.</p>`
+      },
+      vhigh: {
+        name: 'SEHR HOHES Risiko',
+        risk: `<h4>Risikodetails – Sehr hohe Zone</h4><ul><li>Kaum Anpassungsmaßnahmen und/oder sehr hohes Sektorrisiko.</li><li>Sehr hohes Risiko schwerer Einkommensverluste.</li><li>Kann die Asset-Qualität der Bank beeinträchtigen.</li></ul>`,
+        mitigation: `<h4>Was der Landwirt tun muss — Maßnahmen vor Auszahlung/Verlängerung</h4><ul><li><strong>Einfach (sofort):</strong> TRIS + NDS vor Saisonbeginn abschließen.</li><li><strong>Einfach (sofort):</strong> Strohverbrennung stoppen + nur legale Chemikalien verwenden.</li><li><strong>Mittel:</strong> Auf AWD oder DSR umstellen.</li><li><strong>Mittel:</strong> SSNM + IPM zur Reduzierung anwenden.</li><li><strong>Schwieriger:</strong> Wasserquellen verbessern.</li><li><strong>Schwieriger:</strong> Laser Land Leveling (LLL) anwenden.</li></ul><p style="margin-top:.5rem;font-size:.82rem;color:#555;"><strong>Bank:</strong> Obligatorischer CAP · Quartalsweise Nachverfolgung · Kreditbedingungen an Maßnahmen knüpfen.</p>`
+      }
+    },
+    en: {
+      low: {
+        name: 'LOW risk zone',
+        risk: `<h4>Risk details – Low zone</h4><ul><li>Farmer has good adaptation measures relative to sector risk.</li><li>Impacts from natural disasters and transition risks are acceptable.</li><li>Credit risk from ESG factors is low.</li></ul>`,
+        mitigation: `<h4>What the farmer can do (easy → harder)</h4><ul><li><strong>Easy:</strong> Follow weather news / join Line alert groups.</li><li><strong>Easy:</strong> Record fertilizer and chemical use in a farm diary.</li><li><strong>Medium:</strong> Use short-duration rice in risk periods.</li><li><strong>Medium:</strong> Do not burn straw — incorporate instead.</li><li><strong>Additional:</strong> Consider TRIS insurance or SRP/TAS certificates.</li></ul><p style="margin-top:.5rem;font-size:.82rem;color:#555;"><strong>Bank:</strong> Standard credit process · Provide adaptation information.</p>`
+      },
+      med: {
+        name: 'MEDIUM risk zone',
+        risk: `<h4>Risk details – Medium zone</h4><ul><li>Some adaptation measures exist, but gaps remain.</li><li>May be affected by drought, flood, or rising costs.</li><li>Additional monitoring and support recommended.</li></ul>`,
+        mitigation: `<h4>What the farmer can do (easy → harder)</h4><ul><li><strong>Easy:</strong> Apply for TRIS (Tier 1/2) + NDS.</li><li><strong>Easy:</strong> Stop burning straw.</li><li><strong>Medium:</strong> Adopt AWD instead of continuous flooding.</li><li><strong>Medium:</strong> Use only registered chemicals + IPM.</li><li><strong>Harder:</strong> Apply Laser Land Leveling (LLL).</li></ul><p style="margin-top:.5rem;font-size:.82rem;color:#555;"><strong>Bank:</strong> Regular follow-up · Support adaptation measures.</p>`
+      },
+      high: {
+        name: 'HIGH risk zone',
+        risk: `<h4>Risk details – High zone</h4><ul><li>Few adaptation measures and/or high sector risk.</li><li>Elevated risk of significant income loss.</li><li>Active management required.</li></ul>`,
+        mitigation: `<h4>What the farmer must do (easy → harder)</h4><ul><li><strong>Easy (immediately):</strong> Complete TRIS + NDS before the season.</li><li><strong>Easy (immediately):</strong> Stop straw burning + use only registered chemicals.</li><li><strong>Medium:</strong> Switch to AWD or DSR.</li><li><strong>Medium:</strong> Apply SSNM + IPM.</li><li><strong>Harder:</strong> Improve water sources (storage, irrigation, solar).</li></ul><p style="margin-top:.5rem;font-size:.82rem;color:#555;"><strong>Bank:</strong> CAP recommended · Quarterly follow-up.</p>`
+      },
+      vhigh: {
+        name: 'VERY HIGH risk zone',
+        risk: `<h4>Risk details – Very high zone</h4><ul><li>Almost no adaptation measures and/or very high sector risk.</li><li>Very high risk of severe income loss.</li><li>May affect bank asset quality if not managed.</li></ul>`,
+        mitigation: `<h4>What the farmer must do — measures before disbursement/renewal</h4><ul><li><strong>Easy (immediately):</strong> Complete TRIS + NDS before planting.</li><li><strong>Easy (immediately):</strong> Stop straw burning + use only legal chemicals.</li><li><strong>Medium:</strong> Switch to AWD or DSR next season.</li><li><strong>Medium:</strong> Reduce chemicals via SSNM + IPM.</li><li><strong>Harder:</strong> Improve water sources.</li><li><strong>Harder:</strong> Apply Laser Land Leveling (LLL).</li></ul><p style="margin-top:.5rem;font-size:.82rem;color:#555;"><strong>Bank:</strong> Mandatory CAP · Quarterly monitoring · Link loan conditions to measures.</p>`
+      }
+    }
+  };
+
+  const data = content[lang];
+  if (!data) return;
+
+  Object.keys(data).forEach(key => {
+    if (zoneContent[key]) {
+      zoneContent[key].name = data[key].name;
+      zoneContent[key].risk = data[key].risk;
+      zoneContent[key].mitigation = data[key].mitigation;
+    }
+  });
+}
+function updateRadarLabels(lang) {
+  const radarLabels = {
+    th: ['1.ที่ตั้ง', '2.น้ำ', '3.พลังงาน', '4.ห่วงโซ่', '5.ข้อมูล', '6.ประกัน', '7.GHG', '8.พลังงานหมุน', '9.ทรัพยากร', '10.ผลิตภัณฑ์', '11.มลพิษ', '12.ที่ดิน', '13.ชีวภาพ', '14.แรงงาน'],
+    en: ['1.Location', '2.Water', '3.Energy', '4.Supply', '5.Info', '6.Insurance', '7.GHG', '8.Renewable', '9.Resource', '10.Product', '11.Pollution', '12.Land', '13.Biodiversity', '14.Labor'],
+    de: ['1.Standort', '2.Wasser', '3.Energie', '4.Lieferkette', '5.Info', '6.Versicherung', '7.THG', '8.Erneuerbar', '9.Ressource', '10.Produkt', '11.Verschmutzung', '12.Land', '13.Biodiversität', '14.Arbeit']
+  };
+  if (typeof radarChart !== 'undefined' && radarChart && radarLabels[lang]) {
+    radarChart.data.labels = radarLabels[lang];
+    radarChart.update();
+  }
+}
+function translateIndicatorBodies(lang) {
+  const bodies = {
+    en: {
+      1: `<p style="font-size:.9rem;margin-bottom:.5rem;">According to handbook (Tables 3–4): Base score by TRIS zone + cumulative measures (max 1.0)</p>
+          <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:.55rem .8rem;margin-bottom:.6rem;font-size:.8rem;">
+            <strong>Base score by TRIS zone:</strong> High = 0 · Medium = 0.25 · Low = 0.5<br>
+            <strong>+ Measures (+0.25 each):</strong> Short duration variety · Irrigation access · Off-season irrigation
+          </div>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">High risk zone<br>No adaptation measures</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">High risk + short variety<br>or Medium risk only</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Medium risk + short variety<br>or Low risk only</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Medium risk<br>+ irrigation + off-season</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Low risk + irrigation<br>+ off-season + short variety</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Start from TRIS zone then add +0.25 per measure · Cap at 1.0</div>`,
+      2: `<p style="font-size:.9rem;margin-bottom:.5rem;">According to handbook (Table 6): Base by drought risk + cumulative measures</p>
+          <div style="background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;padding:.55rem .8rem;margin-bottom:.6rem;font-size:.8rem;">
+            <strong>Drought base:</strong> High = −0.25 · Medium = 0 · Low = +0.25<br>
+            <strong>+ Water source:</strong> Irrigation +0.5 · Well +0.25<br>
+            <strong>+ Saving (+0.25 each):</strong> LLL · AWD · DSR<br>
+            <strong>+ Storage (FWM +0.25):</strong> Only with at least one of LLL/AWD/DSR
+          </div>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">No irrigation / well / saving</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Well or one saving measure</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Irrigation access</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Irrigation + one saving</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Irrigation + multiple + FWM</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Base by drought then add measures · Floor 0 · Cap 1.0</div>`,
+      3: `<p style="font-size:.9rem;margin-bottom:.5rem;">Energy supply resilience</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">No grid-independent capacity</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">25% grid-independent</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">50% grid-independent</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Full equivalent capacity</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">No pumping or fully renewable</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Score based on share of grid-independent pumping capacity</div>`,
+      4: `<p style="font-size:.9rem;margin-bottom:.5rem;">Supply chain resilience (transport + storage)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Seasonal road only</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">All-weather road access</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Multiple all-weather access</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Highly diversified transport</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Excellent access + full storage</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Score from road access + emergency input storage + harvest storage</div>`,
+      5: `<p style="font-size:.9rem;margin-bottom:.5rem;">Information and early warning systems</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">No monitoring</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Monitors radio/TV + Line groups</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Location-specific agro-met data</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Tailored crop planning with weather models</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> 0.25 / 0.75 / 1.0 levels</div>`,
+      6: `<p style="font-size:.9rem;margin-bottom:.5rem;">Adequate insurance and recovery support</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">NDS eligible</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">TRIS Tier 1/2</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">100% input cost insurance</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">100% income loss insurance</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> NDS = 0.25 · TRIS 1/2 = 0.5 · Full input = 0.75 · Full income = 1.0</div>`,
+      7: `<p style="font-size:.9rem;margin-bottom:.5rem;">Reducing CO₂ and GHG emissions</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">No AWD / DSR</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">AWD or DSR</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">LLL + AWD + SSM combined</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> AWD or DSR ≈ 0.5 · LLL+AWD+SSM = 1.0</div>`,
+      8: `<p style="font-size:.9rem;margin-bottom:.5rem;">Renewable energy (weight ×2)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Grid electricity only</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">≥25% solar pumping</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">~50% solar</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">~75% solar</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">~100% solar or no pumping</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Score by share of solar-powered pumping</div>`,
+      9: `<p style="font-size:.9rem;margin-bottom:.5rem;">Resource efficiency</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">No efficiency measures</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">One measure (water / fertilizer / pesticide / straw)</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Two measures</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Three measures</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">All four measures</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> +0.25 each for water saving, SSNM, IPM, straw management</div>`,
+      10: `<p style="font-size:.9rem;margin-bottom:.5rem;">Sustainable products / certificates (weight ×2)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">No certificate</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Has any listed certificate (TAS, SRP, FSA, organic, etc.)</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Binary — 0 or 1.0</div>`,
+      11: `<p style="font-size:.9rem;margin-bottom:.5rem;">Pollution and emissions (weight ×2)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">No measures</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Registered chemicals + farm diary</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">+ IPM or SSNM</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">+ No burning</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">All measures including no burning</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Cumulative: diary 0.25 + IPM 0.25 + SSNM 0.25 + no burning 0.5</div>`,
+      12: `<p style="font-size:.9rem;margin-bottom:.5rem;">Sustainable land use</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">No measures</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">One measure</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Two measures</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Three–four measures</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">All six measures</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> +0.25 each for AWD, LLL, straw incorporation, IPM, SSNM, crop rotation</div>`,
+      13: `<p style="font-size:.9rem;margin-bottom:.5rem;">Biodiversity protection (weight ×2)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Land converted after 2009</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Registered chemicals + diary</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">+ IPM</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">+ SSNM (full score)</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Default 0 if converted after 2009 · Otherwise cumulative</div>`,
+      14: `<p style="font-size:.9rem;margin-bottom:.5rem;">Health, safety and workers’ rights</p>
+          <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:.55rem .8rem;margin-bottom:.6rem;font-size:.8rem;">
+            <strong>According to handbook (cumulative):</strong><br>
+            • Labor contracts / payment records → +0.25<br>
+            • No child labor → +0.25<br>
+            • Safety training + PPE → +0.25<br>
+            • No hired workers → full score
+          </div>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Labor/safety issues<br>No corrective measures</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">1 measure<br>(contracts or no child labor or training)</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">2 measures</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">3 measures</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">No hired workers<br>or full compliance</div></div>
+          </div>
+          <div class="guidance"><strong>According to handbook:</strong> Each measure adds equally · “No hired workers” can reach full score</div>`
+    },
+    de: {
+      1: `<p style="font-size:.9rem;margin-bottom:.5rem;">Gemäß Handbuch (Tabellen 3–4): Basispunktzahl nach TRIS-Zone + kumulative Maßnahmen (max. 1,0)</p>
+          <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:.55rem .8rem;margin-bottom:.6rem;font-size:.8rem;">
+            <strong>Basis nach TRIS-Zone:</strong> Hoch = 0 · Mittel = 0,25 · Niedrig = 0,5<br>
+            <strong>+ Maßnahmen (je +0,25):</strong> Kurze Sorte · Bewässerungszugang · Bewässerung außerhalb der Saison
+          </div>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Hochrisikozone<br>Keine Anpassungsmaßnahmen</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Hochrisiko + kurze Sorte<br>oder nur Mittelrisiko</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Mittelrisiko + kurze Sorte<br>oder nur Niedrigrisiko</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Mittelrisiko<br>+ Bewässerung + Nebensaison</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Niedrigrisiko + Bewässerung<br>+ Nebensaison + kurze Sorte</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Von TRIS-Zone starten und +0,25 pro Maßnahme · Maximum 1,0</div>`,
+      2: `<p style="font-size:.9rem;margin-bottom:.5rem;">Gemäß Handbuch (Tabelle 6): Basis nach Dürrerisiko + kumulative Maßnahmen</p>
+          <div style="background:#e3f2fd;border:1px solid #90caf9;border-radius:8px;padding:.55rem .8rem;margin-bottom:.6rem;font-size:.8rem;">
+            <strong>Dürre-Basis:</strong> Hoch = −0,25 · Mittel = 0 · Niedrig = +0,25<br>
+            <strong>+ Wasserquelle:</strong> Bewässerung +0,5 · Brunnen +0,25<br>
+            <strong>+ Einsparung (je +0,25):</strong> LLL · AWD · DSR<br>
+            <strong>+ Speicherung (FWM +0,25):</strong> Nur mit mindestens einer von LLL/AWD/DSR
+          </div>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Keine Bewässerung / Brunnen / Einsparung</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Brunnen oder eine Einsparmaßnahme</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Bewässerungszugang</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Bewässerung + eine Einsparung</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Bewässerung + mehrere + FWM</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Basis nach Dürre, dann Maßnahmen addieren · Minimum 0 · Maximum 1,0</div>`,
+      3: `<p style="font-size:.9rem;margin-bottom:.5rem;">Energieversorgungsresilienz</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Keine netzunabhängige Kapazität</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">25 % netzunabhängig</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">50 % netzunabhängig</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Voll äquivalente Kapazität</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Kein Pumpen oder vollständig erneuerbar</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Punkte nach Anteil der netzunabhängigen Pumpkapazität</div>`,
+      4: `<p style="font-size:.9rem;margin-bottom:.5rem;">Lieferkettenresilienz (Transport + Lagerung)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Nur saisonale Straße</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Ganzjähriger Straßenanschluss</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Mehrere ganzjährige Anschlüsse</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Hoch diversifizierter Transport</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Exzellenter Zugang + volle Lagerung</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Punkte aus Straßenanschluss + Notfall-Input-Lager + Ernte-Lager</div>`,
+      5: `<p style="font-size:.9rem;margin-bottom:.5rem;">Informations- und Frühwarnsysteme</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Keine Überwachung</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Radio/TV + Line-Gruppen</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Standortspezifische Agro-Met-Daten</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Maßgeschneiderte Anbauplanung mit Wettermodellen</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Stufen 0,25 / 0,75 / 1,0</div>`,
+      6: `<p style="font-size:.9rem;margin-bottom:.5rem;">Ausreichende Versicherung und Wiederherstellung</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">NDS-berechtigt</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">TRIS Stufe 1/2</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">100 % Input-Kosten-Versicherung</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">100 % Einkommensausfall-Versicherung</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> NDS = 0,25 · TRIS 1/2 = 0,5 · Volle Input = 0,75 · Volles Einkommen = 1,0</div>`,
+      7: `<p style="font-size:.9rem;margin-bottom:.5rem;">Reduzierung von CO₂- und Treibhausgasemissionen</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Kein AWD / DSR</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">AWD oder DSR</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">LLL + AWD + SSM kombiniert</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> AWD oder DSR ≈ 0,5 · LLL+AWD+SSM = 1,0</div>`,
+      8: `<p style="font-size:.9rem;margin-bottom:.5rem;">Erneuerbare Energie (Gewicht ×2)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Nur Netzstrom</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">≥25 % Solar-Pumpen</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">~50 % Solar</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">~75 % Solar</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">~100 % Solar oder kein Pumpen</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Punkte nach Anteil der Solar-Pumpen</div>`,
+      9: `<p style="font-size:.9rem;margin-bottom:.5rem;">Ressourceneffizienz</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Keine Effizienzmaßnahmen</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Eine Maßnahme</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Zwei Maßnahmen</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Drei Maßnahmen</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Alle vier Maßnahmen</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Je +0,25 für Wassersparen, SSNM, IPM, Strohmanagement</div>`,
+      10: `<p style="font-size:.9rem;margin-bottom:.5rem;">Nachhaltige Produkte / Zertifikate (Gewicht ×2)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Kein Zertifikat</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Hat ein gelistetes Zertifikat (TAS, SRP, FSA, Bio usw.)</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Binär — 0 oder 1,0</div>`,
+      11: `<p style="font-size:.9rem;margin-bottom:.5rem;">Verschmutzung und Emissionen (Gewicht ×2)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Keine Maßnahmen</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Registrierte Chemikalien + Hoftagebuch</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">+ IPM oder SSNM</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">+ Kein Verbrennen</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Alle Maßnahmen inkl. kein Verbrennen</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Kumulativ: Tagebuch 0,25 + IPM 0,25 + SSNM 0,25 + kein Verbrennen 0,5</div>`,
+      12: `<p style="font-size:.9rem;margin-bottom:.5rem;">Nachhaltige Landnutzung</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Keine Maßnahmen</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Eine Maßnahme</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">Zwei Maßnahmen</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">Drei–vier Maßnahmen</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Alle sechs Maßnahmen</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Je +0,25 für AWD, LLL, Stroheinarbeitung, IPM, SSNM, Fruchtfolge</div>`,
+      13: `<p style="font-size:.9rem;margin-bottom:.5rem;">Schutz der Biodiversität (Gewicht ×2)</p>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Fläche nach 2009 umgewandelt</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">Registrierte Chemikalien + Tagebuch</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">+ IPM</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">+ SSNM (volle Punktzahl)</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Standard 0 bei Umwandlung nach 2009 · Sonst kumulativ</div>`,
+      14: `<p style="font-size:.9rem;margin-bottom:.5rem;">Gesundheit, Sicherheit und Arbeitnehmerrechte</p>
+          <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:.55rem .8rem;margin-bottom:.6rem;font-size:.8rem;">
+            <strong>Gemäß Handbuch (kumulativ):</strong><br>
+            • Arbeitsverträge / Zahlungsbelege → +0,25<br>
+            • Keine Kinderarbeit → +0,25<br>
+            • Sicherheitsschulung + PSA → +0,25<br>
+            • Keine angestellten Arbeiter → volle Punktzahl
+          </div>
+          <div class="score-options">
+            <div class="score-opt" data-val="0"><div class="val">0</div><div class="desc">Arbeits-/Sicherheitsprobleme<br>Keine Korrekturmaßnahmen</div></div>
+            <div class="score-opt" data-val="0.25"><div class="val">0.25</div><div class="desc">1 Maßnahme<br>(Verträge oder keine Kinderarbeit oder Schulung)</div></div>
+            <div class="score-opt" data-val="0.5"><div class="val">0.5</div><div class="desc">2 Maßnahmen</div></div>
+            <div class="score-opt" data-val="0.75"><div class="val">0.75</div><div class="desc">3 Maßnahmen</div></div>
+            <div class="score-opt" data-val="1"><div class="val">1.0</div><div class="desc">Keine angestellten Arbeiter<br>oder volle Einhaltung</div></div>
+          </div>
+          <div class="guidance"><strong>Gemäß Handbuch:</strong> Jede Maßnahme zählt gleich · „Keine angestellten Arbeiter“ kann volle Punktzahl erreichen</div>`
+    }
+  };
+
+  if (lang === 'th') return;
+
+  const data = bodies[lang];
+  if (!data) return;
+
+  Object.keys(data).forEach(num => {
+    const body = document.querySelector('#ind' + num + ' .indicator-body');
+    if (body) body.innerHTML = data[num];
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll('.score-options').forEach(group => {
+      group.addEventListener('click', function(e) {
+        const opt = e.target.closest('.score-opt');
+        if (!opt) return;
+        e.preventDefault();
+        const ind = parseInt(opt.closest('.indicator').id.replace('ind', ''), 10);
+        const val = parseFloat(opt.getAttribute('data-val'));
+        if (typeof selectScore === 'function') selectScore(ind, val, opt);
+      });
+    });
+  }, 50);
 }
 
 // Call once on load
@@ -2215,7 +2998,16 @@ document.addEventListener('DOMContentLoaded', () => {
   updateRadar(Array(14).fill(0));
   buildMatrix(0, 0);
   initSupabase();
-  setLang('th'); // apply default language after DOM is ready
+  try { setLang('th'); } catch(e) { console.error('Lang init error:', e); }
+
+  // Reliable language buttons
+  document.querySelectorAll('.lang-switch button').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const lang = this.id.replace('btn-', '');
+      setLang(lang);
+    });
+  });
 
   // Reliable bindings (works better than inline handlers in some mobile webviews)
   const areaInput = document.getElementById('area');
