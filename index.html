@@ -934,6 +934,7 @@ function getCurrentFormData() {
     agri_type: document.getElementById('agriType')?.value || null,
     sector_score: parseFloat(document.getElementById('sectorScore')?.value) || null,
     scores: scores,
+    answers: Object.assign({}, answers),
     notes: document.getElementById('notes')?.value || null,
     updated_at: new Date().toISOString()
   };
@@ -1035,6 +1036,12 @@ async function loadByCIF() {
           });
         }
       }
+    }
+    // Restore questionnaire answers
+    if (data.answers && typeof answers !== 'undefined') {
+      for (let k in answers) delete answers[k];
+      Object.assign(answers, data.answers);
+      if (typeof renderQuestions === 'function') renderQuestions();
     }
     if (typeof calculate === 'function') calculate();
     const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('th-TH') : '';
@@ -1776,7 +1783,7 @@ function computeIndicators() {
   const vis = n => !hid.has(n);
   // An unanswered question counts as its lowest-scoring answer, so a customer starts at the highest risk
   // and only answers that are actively given reduce the risk.
-  const WORST = { 1: 'high', 3: 'high', 7: '1', 8: '0', 9: '0', 23: 'yes', 31: '0', 32: '0' };   // all others: 'no'
+  const WORST = { 1: 'high', 3: 'high', 7: 'dirt', 8: '0', 9: 'none', 23: 'yes', 31: '0', 32: '0' };   // all others: 'no'
   const val = n => (vis(n) && answers[n] !== undefined) ? answers[n] : (WORST[n] || 'no');
   const yes = n => val(n) === 'yes' ? 1 : 0;
   // skipped by a certificate counts as yes (except Q19, Q20)
@@ -1785,7 +1792,10 @@ function computeIndicators() {
   const clip = v => Math.max(0, Math.min(1, v));
   const lll = yc(11), awd = yc(12), dsr = yc(13), ipm = yc(14), ssnm = yc(15), burn = yc(16);
   const anyWater = (lll + awd + dsr) > 0;
-  const road = Number(val(7));
+  const roadMap = { dirt: 1, one: 2, multi: 3, good: 4, '1': 1, '2': 2, '3': 3, '4': 4 };
+  const road = roadMap[val(7)] || 0;
+  const storeMap = { all: 100, half: 50, some: 25, none: 0, '100': 100, '50': 50, '25': 25, '0': 0 };
+  const storePct = (storeMap[val(9)] !== undefined) ? storeMap[val(9)] / 100 : (Number(val(9)) / 100 || 0);
   const out = {};
   out[1] = clip(PTS.trisZone[val(1)] + PTS.irr1 * yes(4) + PTS.off * yes(5) + PTS.shortVar * yes(19));
   out[2] = clip(PTS.drought[val(3)] + PTS.irr2 * yes(4) + PTS.well * yes(28) + PTS.lll2 * lll + PTS.awd2 * awd + PTS.dsr2 * dsr
@@ -1793,7 +1803,7 @@ function computeIndicators() {
   out[3] = yes(30) ? 1 : clip(pct(31));
   if (road === 0) out[4] = 0;
   else if (road === 4) out[4] = PTS.road[4];
-  else out[4] = clip(PTS.road[road] + (pct(8) >= PTS.bufNeed[road] ? PTS.bufPts : 0) + (pct(9) >= PTS.bufNeed[road] ? PTS.harvPts : 0));
+  else out[4] = clip(PTS.road[road] + (pct(8) >= PTS.bufNeed[road] ? PTS.bufPts : 0) + (storePct >= PTS.bufNeed[road] ? PTS.harvPts : 0));
   out[5] = clip(PTS.weather * yes(20));
   out[6] = clip(PTS.nds + PTS.tris * yes(2));
   out[7] = clip(PTS.awd7 * awd + PTS.dsr7 * dsr + (lll && awd && ssnm ? PTS.combo7 : 0));
