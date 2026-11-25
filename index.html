@@ -1676,13 +1676,13 @@ function resetForm() {
 const QHELP = {
   th: {
     1: '<strong>คืออะไร:</strong> ระดับความเสี่ยงอุทกภัยของพื้นที่เพาะปลูก<br><strong>วิธีหา:</strong> ดูที่ <a href="https://riskmap.disaster.go.th" target="_blank" style="color:#1565c0; font-weight:700; text-decoration:underline;">riskmap.disaster.go.th</a> หรือระบบ ธ.ก.ส.',
-    2: '<strong>คืออะไร:</strong> ลูกค้าจ่ายเบี้ยประกัน TRIS สม่ำเสมอและมีสิทธิ์เรียกร้องค่าสินไหมได้หรือไม่<br><strong>TRIS</strong> = ประกันภัยข้าวของเกษตรกร',
+    2: '<strong>คืออะไร:</strong> ระดับความเสี่ยงภัยแล้งของพื้นที่เพาะปลูก<br><strong>วิธีหา:</strong> ดูที่ <a href="https://riskmap.disaster.go.th/drought" target="_blank" style="color:#1565c0; font-weight:700; text-decoration:underline;">riskmap.disaster.go.th/drought</a>',
+    3: '<strong>คืออะไร:</strong> ลูกค้าจ่ายเบี้ยประกัน TRIS สม่ำเสมอและมีสิทธิ์เรียกร้องค่าสินไหมได้หรือไม่<br><strong>TRIS</strong> = ประกันภัยข้าวของเกษตรกร',
     11: '<strong>LLL</strong> = ปรับระดับดินด้วยเลเซอร์ (ทำพื้นนาเรียบ น้ำกระจายสม่ำเสมอ)',
     12: '<strong>AWD</strong> = ทำนาแบบเปียกสลับแห้ง (ขังน้ำสลับปล่อยให้ดินแห้ง เป็นรอบๆ)',
     13: '<strong>DSR</strong> = หว่านข้าวแห้ง (หว่านเมล็ดลงดินโดยตรง ไม่ต้องเพาะกล้า)',
     14: '<strong>IPM</strong> = จัดการศัตรูพืชแบบผสมผสาน (ใช้วิธีธรรมชาติร่วมด้วย เพื่อลดสารเคมี)',
     15: '<strong>SSNM</strong> = ใส่ปุ๋ยตามค่าดิน (ตรวจดินก่อน แล้วใส่ปุ๋ยเท่าที่จำเป็น)',
-    3: '<strong>คืออะไร:</strong> ระดับความเสี่ยงภัยแล้งของพื้นที่เพาะปลูก<br><strong>วิธีหา:</strong> ดูที่ <a href="https://riskmap.disaster.go.th/drought" target="_blank" style="color:#1565c0; font-weight:700; text-decoration:underline;">riskmap.disaster.go.th/drought</a>',
     4: '<strong>คืออะไร:</strong> มีคลองส่งน้ำหรือสามารถสูบน้ำจากแม่น้ำอย่างถูกกฎหมายได้หรือไม่ (ไม่นับบ่อบาดาล)<br><strong>วิธีหา:</strong> สอบถามลูกค้า หรือสังเกตจากพื้นที่',
     5: '<strong>คืออะไร:</strong> มีน้ำชลประทานเพียงพอสำหรับปลูกข้าวนาปรังได้หรือไม่<br><strong>วิธีหา:</strong> สอบถามลูกค้าหรือหน่วยงานชลประทาน',
     6: '<strong>คืออะไร:</strong> ที่ดินถูกเปลี่ยนจากพื้นที่ธรรมชาติเป็นนาหลังวันที่ 1 ม.ค. 2552 หรือไม่ (ตามมาตรฐาน SRP)<br><strong>วิธีหา:</strong> สอบถามลูกค้าว่าใช้ที่ดินนี้ทำการเกษตรมานานแค่ไหน',
@@ -1699,8 +1699,8 @@ const QHELP = {
   },
   en: {
     1: '<strong>What:</strong> Flood risk level of the farm area<br><strong>How:</strong> Check <a href="https://riskmap.disaster.go.th" target="_blank" style="color:#1565c0; font-weight:700; text-decoration:underline;">riskmap.disaster.go.th</a> or BAAC system',
-    2: '<strong>What:</strong> Does the customer pay TRIS premiums regularly and can claim?<br><strong>How:</strong> Check BAAC system or customer documents',
-    3: '<strong>What:</strong> Drought risk level of the farm area<br><strong>How:</strong> Check <a href="https://riskmap.disaster.go.th/drought" target="_blank" style="color:#1565c0; font-weight:700; text-decoration:underline;">riskmap.disaster.go.th/drought</a>',
+    2: '<strong>What:</strong> Drought risk level of the farm area<br><strong>How:</strong> Check <a href="https://riskmap.disaster.go.th/drought" target="_blank" style="color:#1565c0; font-weight:700; text-decoration:underline;">riskmap.disaster.go.th/drought</a>',
+    3: '<strong>What:</strong> Does the customer pay TRIS premiums regularly and can claim?<br><strong>How:</strong> Check BAAC system or customer documents',
     4: '<strong>What:</strong> Is there an irrigation canal or legal river pumping? (Not groundwater)<br><strong>How:</strong> Ask the farmer or observe the area',
     6: '<strong>What:</strong> Was the land converted from natural area to rice field after 1 Jan 2009?<br><strong>How:</strong> Ask how long the land has been farmed',
     7: '<strong>What:</strong> How many all-weather roads connect the farm to seed/fertilizer shops or mills?<br><strong>How:</strong> Use local knowledge or Google Maps',
@@ -1710,8 +1710,8 @@ const QHELP = {
   },
   de: {
     1: '<strong>Was:</strong> TRIS ist die Reisversicherung der BAAC. Das Risiko hängt vom Standort ab.<br><strong>Wie:</strong> Im BAAC-System, auf der Quittung oder unter riskmap.disaster.go.th prüfen',
-    2: '<strong>Was:</strong> Zahlt der Kunde regelmäßig TRIS-Prämien und kann Ansprüche geltend machen?<br><strong>Wie:</strong> Im BAAC-System oder in den Unterlagen prüfen',
-    3: '<strong>Was:</strong> Wie hoch ist das Dürrerisiko in diesem Gebiet?<br><strong>Wie:</strong> Unter riskmap.disaster.go.th/drought prüfen',
+    2: '<strong>Was:</strong> Wie hoch ist das Dürrerisiko in diesem Gebiet?<br><strong>Wie:</strong> Unter riskmap.disaster.go.th/drought prüfen',
+    3: '<strong>Was:</strong> Zahlt der Kunde regelmäßig TRIS-Prämien und kann Ansprüche geltend machen?<br><strong>Wie:</strong> Im BAAC-System oder in den Unterlagen prüfen',
     4: '<strong>Was:</strong> Gibt es einen Bewässerungskanal oder legale Flusspumpen? (Kein Grundwasser)<br><strong>Wie:</strong> Den Landwirt fragen oder vor Ort ansehen',
     6: '<strong>Was:</strong> Wurde das Land nach dem 1.1.2009 von Naturfläche in Reisfeld umgewandelt?<br><strong>Wie:</strong> Fragen, wie lange das Land schon bewirtschaftet wird',
     10: '<strong>Was:</strong> Hat der Landwirt ein nachhaltiges Reis-Zertifikat (TAS, SRP, Bio usw.)?<br><strong>Wie:</strong> Das Zertifikat vorzeigen lassen',
